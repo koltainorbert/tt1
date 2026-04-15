@@ -1,0 +1,14 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "Teszt B�la",
+      "email": "bela@teszt.hu",
+      "password_hash": "$2a$10$YOhz.ckDUIJI7jwZDR1FtupFCvi6t1bDIgQxGAwTdIcl1Bo5N5K4C",
+      "phone": "+36301234567",
+      "created_at": "2026-04-15 15:35:53"
+    }
+  ],
+  "listings": [],
+  "messages": []
+}
