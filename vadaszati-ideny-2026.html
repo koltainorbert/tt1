@@ -584,6 +584,79 @@
     .info-grid dt{color:rgba(255,255,255,.4);white-space:nowrap}
     .info-grid dd{color:rgba(255,255,255,.75)}
 
+    /* ── HOLDNAPTÁR ── */
+    .moon-section{
+      background:linear-gradient(180deg,rgba(20,10,10,.95) 0%,rgba(6,6,6,.98) 100%);
+      border:1px solid rgba(255,0,0,.18);
+      border-radius:10px;margin:24px 0;padding:20px;
+      box-shadow:0 0 40px rgba(0,0,0,.6),inset 0 0 60px rgba(255,0,0,.03);
+    }
+    .moon-header{
+      display:flex;align-items:center;justify-content:space-between;
+      margin-bottom:16px;
+    }
+    .moon-nav{
+      background:rgba(255,0,0,.1);border:1px solid rgba(255,0,0,.35);
+      color:#fff;border-radius:6px;width:36px;height:36px;
+      font-size:1rem;cursor:pointer;transition:all .15s;flex-shrink:0;
+    }
+    .moon-nav:hover{background:rgba(255,0,0,.25);border-color:#ff0000;}
+    .moon-title-wrap{display:flex;align-items:center;gap:14px;flex:1;justify-content:center;}
+    .moon-icon-big{font-size:2.8rem;line-height:1;filter:drop-shadow(0 0 8px rgba(255,220,100,.5));}
+    .moon-cur-name{font-size:1.1rem;font-weight:700;color:#fff;letter-spacing:.06em;}
+    .moon-cur-sub{font-size:.75rem;color:rgba(255,255,255,.5);margin-top:2px;}
+    .moon-grid{
+      display:grid;
+      grid-template-columns:repeat(7,1fr);
+      gap:4px;margin-bottom:14px;
+    }
+    .moon-dow{
+      text-align:center;font-size:.6rem;font-weight:700;
+      color:rgba(255,255,255,.35);letter-spacing:.08em;padding:4px 0 6px;
+      text-transform:uppercase;
+    }
+    .moon-day{
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.06);
+      border-radius:7px;padding:6px 3px 5px;
+      text-align:center;cursor:default;
+      transition:all .15s;
+      position:relative;
+    }
+    .moon-day:not(.moon-empty):hover{
+      background:rgba(255,0,0,.1);border-color:rgba(255,0,0,.4);
+      transform:translateY(-1px);
+    }
+    .moon-day.moon-today{
+      border-color:#ff0000;
+      background:rgba(255,0,0,.12);
+      box-shadow:0 0 10px rgba(255,0,0,.3);
+    }
+    .moon-day.moon-today .moon-dnum{color:#ff4444;font-weight:700;}
+    .moon-day.moon-fullnew{border-color:rgba(255,200,50,.4);background:rgba(255,200,50,.07);}
+    .moon-day.moon-empty{background:none;border-color:transparent;}
+    .moon-dicon{font-size:1.4rem;display:block;line-height:1;margin-bottom:2px;}
+    .moon-dnum{font-size:.72rem;color:rgba(255,255,255,.7);line-height:1;}
+    .moon-dpct{font-size:.55rem;color:rgba(255,255,255,.35);margin-top:1px;}
+    .moon-legend{
+      display:flex;flex-wrap:wrap;gap:6px 16px;
+      font-size:.65rem;color:rgba(255,255,255,.4);
+      margin-bottom:12px;
+    }
+    .moon-hunt-tip{
+      background:rgba(255,200,50,.07);border:1px solid rgba(255,200,50,.2);
+      border-radius:6px;padding:10px 14px;
+      font-size:.78rem;color:rgba(255,255,255,.8);
+      line-height:1.5;
+    }
+    @media(max-width:700px){
+      .moon-grid{grid-template-columns:repeat(7,1fr);gap:2px;}
+      .moon-dicon{font-size:1.1rem;}
+      .moon-dnum{font-size:.6rem;}
+      .moon-dpct{display:none;}
+      .moon-legend{font-size:.58rem;gap:4px 10px;}
+    }
+
     /* ── FOOTER ── */
     footer{
       text-align:center;margin-top:28px;
@@ -948,6 +1021,27 @@
 </div>
 
 <p class="subtitle">Csoportokra kattintva össze/kibontható &nbsp;·&nbsp; <span style="color:#ff0000;font-weight:700">|</span> = ma</p>
+
+<!-- HOLDNAPTÁR -->
+<div class="moon-section">
+  <div class="moon-header">
+    <button class="moon-nav" id="moon-prev">&#9664;</button>
+    <div class="moon-title-wrap">
+      <span class="moon-icon-big" id="moon-cur-icon"></span>
+      <div>
+        <div class="moon-cur-name" id="moon-cur-name"></div>
+        <div class="moon-cur-sub" id="moon-cur-sub"></div>
+      </div>
+    </div>
+    <button class="moon-nav" id="moon-next">&#9654;</button>
+  </div>
+  <div class="moon-grid" id="moon-grid"></div>
+  <div class="moon-legend">
+    <span>🌑 Újhold</span><span>🌒 Növekvő sarló</span><span>🌓 Első negyed</span><span>🌔 Növekvő domboru</span>
+    <span>🌕 Telihold</span><span>🌖 Fogyó domboru</span><span>🌗 Utolsó negyed</span><span>🌘 Fogyó sarló</span>
+  </div>
+  <div class="moon-hunt-tip" id="moon-hunt-tip"></div>
+</div>
 
 <div class="legend">
   <div class="leg"><div class="leg-dot" style="background:#1ec854"></div>Gímszarvas</div>
