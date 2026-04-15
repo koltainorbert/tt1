@@ -33,9 +33,19 @@
         "/uploads/1776267685052-0h134apcrvoo.jpg"
       ],
       "status": "active",
-      "views": 0,
+      "views": 2,
       "created_at": "2026-04-15 15:41:25"
     }
   ],
-  "messages": []
+  "messages": [
+    {
+      "id": 1,
+      "listing_id": 1,
+      "sender_name": "Koltai Norbert",
+      "sender_email": "koltainorbert@gmail.com",
+      "message": "szia ez egy üzenet",
+      "read": 0,
+      "created_at": "2026-04-15 15:42:04"
+    }
+  ]
 }
