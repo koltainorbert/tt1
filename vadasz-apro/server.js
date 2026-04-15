@@ -7,68 +7,69 @@ const multer   = require('multer');
 const path     = require('path');
 const fs       = require('fs');
 
-const app    = express();
-const PORT   = process.env.PORT || 3001;
-const SECRET = process.env.JWT_SECRET || 'vadasz-apro-2026-changeme';
+const app  = express();
+const PORT = process.env.PORT || 3001;
+const SECRET = process.env.JWT_SECRET || 'vadasz-apro-2026-dev-change-me';
 
-// ‚îÄ‚îÄ UPLOADS DIR ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ
+// ¶¶ DIRS ¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶
 const UPLOADS = path.join(__dirname, 'public', 'uploads');
+const PUBLIC  = path.join(__dirname, 'public');
 if (!fs.existsSync(UPLOADS)) fs.mkdirSync(UPLOADS, { recursive: true });
 
-// ‚îÄ‚îÄ DATABASE ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ
+// ¶¶ DATABASE ¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶
 const db = new Database(path.join(__dirname, 'vadasz.db'));
 db.pragma('journal_mode = WAL');
 db.pragma('foreign_keys = ON');
-
 db.exec(`
   CREATE TABLE IF NOT EXISTS users (
     id            INTEGER PRIMARY KEY AUTOINCREMENT,
-    name          TEXT    NOT NULL,
-    email         TEXT    UNIQUE NOT NULL COLLATE NOCASE,
-    password_hash TEXT    NOT NULL,
-    phone         TEXT    DEFAULT '',
-    created_at    TEXT    DEFAULT (datetime('now'))
+    name          TEXT NOT NULL,
+    email         TEXT UNIQUE NOT NULL COLLATE NOCASE,
+    password_hash TEXT NOT NULL,
+    phone         TEXT DEFAULT '',
+    created_at    TEXT DEFAULT (datetime('now'))
   );
   CREATE TABLE IF NOT EXISTS listings (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id     INTEGER NOT NULL,
-    title       TEXT    NOT NULL,
-    description TEXT    DEFAULT '',
+    title       TEXT NOT NULL,
+    description TEXT DEFAULT '',
     price       INTEGER DEFAULT 0,
-    category    TEXT    NOT NULL,
-    location    TEXT    DEFAULT '',
-    images      TEXT    DEFAULT '[]',
-    status      TEXT    DEFAULT 'active',
+    category    TEXT NOT NULL,
+    location    TEXT DEFAULT '',
+    images      TEXT DEFAULT '[]',
+    status      TEXT DEFAULT 'active',
     views       INTEGER DEFAULT 0,
-    created_at  TEXT    DEFAULT (datetime('now')),
+    created_at  TEXT DEFAULT (datetime('now')),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
   );
   CREATE TABLE IF NOT EXISTS messages (
-    id            INTEGER PRIMARY KEY AUTOINCREMENT,
-    listing_id    INTEGER NOT NULL,
-    sender_name   TEXT    NOT NULL,
-    sender_email  TEXT    NOT NULL,
-    message       TEXT    NOT NULL,
-    read          INTEGER DEFAULT 0,
-    created_at    TEXT    DEFAULT (datetime('now')),
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    listing_id   INTEGER NOT NULL,
+    sender_name  TEXT NOT NULL,
+    sender_email TEXT NOT NULL,
+    message      TEXT NOT NULL,
+    read         INTEGER DEFAULT 0,
+    created_at   TEXT DEFAULT (datetime('now')),
     FOREIGN KEY (listing_id) REFERENCES listings(id) ON DELETE CASCADE
   );
   CREATE INDEX IF NOT EXISTS idx_listings_cat    ON listings(category);
-  CREATE INDEX IF NOT EXISTS idx_listings_user   ON listings(user_id);
   CREATE INDEX IF NOT EXISTS idx_listings_status ON listings(status);
+  CREATE INDEX IF NOT EXISTS idx_listings_user   ON listings(user_id);
 `);
 
-// ‚îÄ‚îÄ MIDDLEWARE ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ
-app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+// ¶¶ MIDDLEWARE ¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶
+app.use(express.json({ limit: '1mb' }));
+app.use(express.static(PUBLIC));
 
-// ‚îÄ‚îÄ AUTH MIDDLEWARE ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ
 function auth(req, res, next) {
   const h = req.headers.authorization;
-  if (!h || !h.startsWith('Bearer ')) return res.status(401).json({ error: 'Nincs bejelentkezve' });
+  if (!h || !h.startsWith('Bearer '))
+    return res.status(401).json({ error: 'Nincs bejelentkezve' });
   try { req.user = jwt.verify(h.slice(7), SECRET); next(); }
-  catch { res.status(401).json({ error: '√ârv√©nytelen token' }); }
+  catch { res.status(401).json({ error: 'ErvÈnytelen token' }); }
 }
+
 function optAuth(req, res, next) {
   const h = req.headers.authorization;
   if (h && h.startsWith('Bearer ')) {
@@ -77,241 +78,162 @@ function optAuth(req, res, next) {
   next();
 }
 
-// ‚îÄ‚îÄ FILE UPLOAD ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ
+// ¶¶ FILE UPLOAD ¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶
 const storage = multer.diskStorage({
   destination: UPLOADS,
-  filename: (_, file, cb) => {
-    const ext = path.extname(file.originalname).toLowerCase().replace(/[^.a-z0-9]/g, '');
+  filename(_, file, cb) {
+    const ext = path.extname(file.originalname).toLowerCase().replace(/[^.a-z0-9]/g,'');
     cb(null, `${Date.now()}-${Math.random().toString(36).slice(2)}${ext}`);
   }
 });
 const upload = multer({
   storage,
-  limits: { fileSize: 8 * 1024 * 1024, files: 6 },
-  fileFilter: (_, file, cb) => {
-    if (/^image\/(jpeg|jpg|png|webp|gif)$/i.test(file.mimetype)) cb(null, true);
-    else cb(new Error('Csak k√©pf√°jlok t√∂lthet≈ëk fel'));
+  limits: { fileSize: 8*1024*1024, files: 6 },
+  fileFilter(_, file, cb) {
+    /^image\/(jpeg|jpg|png|webp|gif)$/i.test(file.mimetype) ? cb(null,true) : cb(new Error('Csak kÈpek'));
   }
 });
 
-// ‚îÄ‚îÄ HELPERS ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ
-const isEmail = s => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
-const fmt = (row, user) => ({
-  ...row,
-  images:  JSON.parse(row.images  || '[]'),
-  isMine:  user ? row.user_id === user.id : false
-});
+function fmtListing(row, user) {
+  return {
+    ...row,
+    images:       JSON.parse(row.images || '[]'),
+    isMine:       user ? row.user_id === user.id : false,
+    seller_phone: user ? (row.seller_phone || '') : null,
+  };
+}
+function validateEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
 
-// ‚îÄ‚îÄ AUTH ROUTES ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ
+// ¶¶ AUTH ¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶
 app.post('/api/auth/register', (req, res) => {
   const { name, email, password, phone } = req.body || {};
-  if (!name || !email || !password)        return res.status(400).json({ error: 'Hi√°nyz√≥ adatok' });
-  if (!isEmail(email))                     return res.status(400).json({ error: '√ârv√©nytelen email c√≠m' });
-  if (password.length < 6)                 return res.status(400).json({ error: 'A jelsz√≥ minimum 6 karakter' });
-  if (name.trim().length < 2)              return res.status(400).json({ error: 'A n√©v legal√°bb 2 karakter' });
+  if (!name||!email||!password) return res.status(400).json({error:'Kˆtelezı mezık hi·nyoznak'});
+  if (typeof name!=='string'||name.trim().length<2) return res.status(400).json({error:'…rvÈnytelen nÈv'});
+  if (!validateEmail(email)) return res.status(400).json({error:'…rvÈnytelen email cÌm'});
+  if (typeof password!=='string'||password.length<6) return res.status(400).json({error:'JelszÛ min. 6 karakter'});
   try {
     const hash = bcrypt.hashSync(password, 10);
-    const r = db.prepare(
-      'INSERT INTO users (name, email, password_hash, phone) VALUES (?, ?, ?, ?)'
-    ).run(name.trim(), email.trim().toLowerCase(), hash, (phone || '').trim());
+    const r = db.prepare('INSERT INTO users (name,email,password_hash,phone) VALUES (?,?,?,?)')
+      .run(name.trim(), email.trim().toLowerCase(), hash, (phone||'').toString().trim().slice(0,30));
     const user  = { id: r.lastInsertRowid, name: name.trim(), email: email.trim().toLowerCase() };
-    const token = jwt.sign(user, SECRET, { expiresIn: '30d' });
+    const token = jwt.sign(user, SECRET, { expiresIn:'30d' });
     res.status(201).json({ user, token });
-  } catch (e) {
-    if (e.message.includes('UNIQUE')) return res.status(409).json({ error: 'Ez az email m√°r regisztr√°lt' });
-    console.error(e); res.status(500).json({ error: 'Szerver hiba' });
+  } catch(e) {
+    if (e.message.includes('UNIQUE')) return res.status(409).json({error:'Ez az email m·r regisztr·lt'});
+    console.error(e); res.status(500).json({error:'Szerver hiba'});
   }
 });
 
 app.post('/api/auth/login', (req, res) => {
   const { email, password } = req.body || {};
-  if (!email || !password) return res.status(400).json({ error: 'Hi√°nyz√≥ adatok' });
-  const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email.trim().toLowerCase());
-  if (!user || !bcrypt.compareSync(password, user.password_hash))
-    return res.status(401).json({ error: 'Hib√°s email vagy jelsz√≥' });
-  const payload = { id: user.id, name: user.name, email: user.email };
-  const token   = jwt.sign(payload, SECRET, { expiresIn: '30d' });
-  res.json({ user: payload, token });
+  if (!email||!password) return res.status(400).json({error:'Kˆtelezı mezık hi·nyoznak'});
+  const user = db.prepare('SELECT * FROM users WHERE email=?').get((email||'').trim().toLowerCase());
+  if (!user||!bcrypt.compareSync(password, user.password_hash))
+    return res.status(401).json({error:'Hib·s email vagy jelszÛ'});
+  const payload = { id:user.id, name:user.name, email:user.email };
+  const token   = jwt.sign(payload, SECRET, { expiresIn:'30d' });
+  res.json({ user:payload, token });
 });
 
 app.get('/api/auth/me', auth, (req, res) => {
-  const u = db.prepare('SELECT id, name, email, phone, created_at FROM users WHERE id = ?').get(req.user.id);
-  if (!u) return res.status(404).json({ error: 'Felhaszn√°l√≥ nem tal√°lhat√≥' });
-  res.json(u);
+  const user = db.prepare('SELECT id,name,email,phone,created_at FROM users WHERE id=?').get(req.user.id);
+  if (!user) return res.status(404).json({error:'Felhaszn·lÛ nem tal·lhatÛ'});
+  res.json(user);
 });
 
 app.put('/api/auth/me', auth, (req, res) => {
   const { name, phone } = req.body || {};
-  if (name && name.trim().length < 2) return res.status(400).json({ error: '√ârv√©nytelen n√©v' });
-  db.prepare('UPDATE users SET name = COALESCE(?, name), phone = COALESCE(?, phone) WHERE id = ?')
-    .run(name ? name.trim() : null, phone !== undefined ? phone.trim() : null, req.user.id);
-  const u = db.prepare('SELECT id, name, email, phone, created_at FROM users WHERE id = ?').get(req.user.id);
-  res.json(u);
+  if (!name||name.trim().length<2) return res.status(400).json({error:'…rvÈnytelen nÈv'});
+  db.prepare('UPDATE users SET name=?,phone=? WHERE id=?')
+    .run(name.trim(), (phone||'').toString().trim().slice(0,30), req.user.id);
+  res.json({ ok:true, name:name.trim(), phone:(phone||'').toString().trim() });
 });
 
-// ‚îÄ‚îÄ LISTING ROUTES ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ
+// ¶¶ LISTINGS ¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶
 app.get('/api/listings', optAuth, (req, res) => {
-  const { category, search, page = 1, sort = 'new', mine } = req.query;
+  const { category, search, page='1', sort='new', mine } = req.query;
   const limit  = 24;
-  const offset = (Math.max(parseInt(page) || 1, 1) - 1) * limit;
-
-  const where  = [];
+  const offset = (Math.max(1,parseInt(page))-1)*limit;
+  const conds  = ["l.status='active'"];
   const params = [];
 
-  if (mine && req.user) {
-    where.push('l.user_id = ?'); params.push(req.user.id);
+  if (mine==='1'&&req.user) {
+    conds.length=0; conds.push('l.user_id=?'); params.push(req.user.id);
   } else {
-    where.push("l.status = 'active'");
-    if (category) { where.push('l.category = ?'); params.push(category); }
-    if (search) {
-      where.push('(l.title LIKE ? OR l.description LIKE ? OR l.location LIKE ?)');
-      const q = `%${search}%`;
-      params.push(q, q, q);
-    }
+    if (category) { conds.push('l.category=?'); params.push(category); }
+    if (search)   { conds.push('(l.title LIKE ? OR l.description LIKE ? OR l.location LIKE ?)'); params.push(`%${search}%`,`%${search}%`,`%${search}%`); }
   }
 
-  const W = where.join(' AND ');
-  const ORDER = {
-    new:        'l.created_at DESC',
-    old:        'l.created_at ASC',
-    price_asc:  'l.price ASC',
-    price_desc: 'l.price DESC',
-    views:      'l.views DESC'
-  }[sort] || 'l.created_at DESC';
+  const where  = conds.join(' AND ');
+  const orders = { new:'l.created_at DESC', old:'l.created_at ASC', price_asc:'l.price ASC', price_desc:'l.price DESC', views:'l.views DESC' };
+  const order  = orders[sort]||'l.created_at DESC';
 
-  const total = db.prepare(`SELECT COUNT(*) n FROM listings l WHERE ${W}`).get(...params).n;
-  const rows  = db.prepare(
-    `SELECT l.*, u.name seller_name FROM listings l
-     JOIN users u ON l.user_id = u.id
-     WHERE ${W} ORDER BY ${ORDER} LIMIT ? OFFSET ?`
-  ).all(...params, limit, offset);
-
-  res.json({
-    listings: rows.map(r => fmt(r, req.user)),
-    total, page: parseInt(page) || 1,
-    pages: Math.ceil(total / limit)
-  });
+  const total = db.prepare(`SELECT COUNT(*) n FROM listings l WHERE ${where}`).get(...params).n;
+  const rows  = db.prepare(`SELECT l.*,u.name AS seller_name,u.phone AS seller_phone FROM listings l JOIN users u ON l.user_id=u.id WHERE ${where} ORDER BY ${order} LIMIT ? OFFSET ?`).all(...params,limit,offset);
+  res.json({ listings:rows.map(r=>fmtListing(r,req.user)), total, page:parseInt(page), pages:Math.max(1,Math.ceil(total/limit)) });
 });
 
 app.get('/api/listings/:id', optAuth, (req, res) => {
-  const row = db.prepare(
-    `SELECT l.*, u.name seller_name, u.phone seller_phone, u.email seller_email
-     FROM listings l JOIN users u ON l.user_id = u.id WHERE l.id = ?`
-  ).get(req.params.id);
-  if (!row) return res.status(404).json({ error: 'Hirdet√©s nem tal√°lhat√≥' });
-  db.prepare('UPDATE listings SET views = views + 1 WHERE id = ?').run(req.params.id);
-  row.views += 1;
-  const result = fmt(row, req.user);
-  // Only reveal contact info if authenticated
-  if (!req.user) { delete result.seller_phone; delete result.seller_email; }
-  res.json(result);
+  const row = db.prepare('SELECT l.*,u.name AS seller_name,u.phone AS seller_phone FROM listings l JOIN users u ON l.user_id=u.id WHERE l.id=?').get(req.params.id);
+  if (!row) return res.status(404).json({error:'HirdetÈs nem tal·lhatÛ'});
+  db.prepare('UPDATE listings SET views=views+1 WHERE id=?').run(req.params.id);
+  row.views+=1;
+  res.json(fmtListing(row,req.user));
 });
 
-app.post('/api/listings', auth, upload.array('images', 6), (req, res) => {
-  const { title, description, price, category, location } = req.body || {};
-  if (!title || !title.trim())    return res.status(400).json({ error: 'A c√≠m k√∂telez≈ë' });
-  if (!category)                  return res.status(400).json({ error: 'A kateg√≥ria k√∂telez≈ë' });
-  if (title.trim().length > 120)  return res.status(400).json({ error: 'A c√≠m max 120 karakter' });
-
-  const images = (req.files || []).map(f => '/uploads/' + f.filename);
-  const r = db.prepare(
-    'INSERT INTO listings (user_id, title, description, price, category, location, images) VALUES (?,?,?,?,?,?,?)'
-  ).run(
-    req.user.id, title.trim(), (description || '').trim(),
-    Math.max(parseInt(price) || 0, 0), category,
-    (location || '').trim(), JSON.stringify(images)
-  );
-  const listing = db.prepare(
-    'SELECT l.*, u.name seller_name FROM listings l JOIN users u ON l.user_id = u.id WHERE l.id = ?'
-  ).get(r.lastInsertRowid);
-  res.status(201).json(fmt(listing, req.user));
-});
-
-app.put('/api/listings/:id', auth, upload.array('images', 6), (req, res) => {
-  const existing = db.prepare('SELECT * FROM listings WHERE id = ? AND user_id = ?').get(req.params.id, req.user.id);
-  if (!existing) return res.status(404).json({ error: 'Hirdet√©s nem tal√°lhat√≥' });
-
-  const { title, description, price, category, location, keep_images } = req.body || {};
-  let images = JSON.parse(existing.images || '[]');
-
-  // Keep only explicitly kept images
-  if (keep_images !== undefined) {
-    const keep = Array.isArray(keep_images) ? keep_images : [keep_images];
-    const toDelete = images.filter(i => !keep.includes(i));
-    toDelete.forEach(img => {
-      const file = path.join(__dirname, 'public', img);
-      if (fs.existsSync(file)) fs.unlinkSync(file);
-    });
-    images = keep;
-  }
-  const newImgs = (req.files || []).map(f => '/uploads/' + f.filename);
-  images = [...images, ...newImgs].slice(0, 6);
-
-  db.prepare(
-    `UPDATE listings SET title=COALESCE(?,title), description=COALESCE(?,description),
-     price=COALESCE(?,price), category=COALESCE(?,category),
-     location=COALESCE(?,location), images=? WHERE id=?`
-  ).run(
-    title ? title.trim() : null,
-    description !== undefined ? description.trim() : null,
-    price !== undefined ? Math.max(parseInt(price) || 0, 0) : null,
-    category || null, location ? location.trim() : null,
-    JSON.stringify(images), req.params.id
-  );
-
-  const listing = db.prepare(
-    'SELECT l.*, u.name seller_name FROM listings l JOIN users u ON l.user_id = u.id WHERE l.id = ?'
-  ).get(req.params.id);
-  res.json(fmt(listing, req.user));
+app.post('/api/listings', auth, upload.array('images',6), (req, res) => {
+  const { title, description, price, category, location } = req.body||{};
+  if (!title||!title.trim()) return res.status(400).json({error:'A cÌm kˆtelezı'});
+  if (!category||!category.trim()) return res.status(400).json({error:'A kategÛria kˆtelezı'});
+  const images = (req.files||[]).map(f=>'/uploads/'+f.filename);
+  const result = db.prepare('INSERT INTO listings (user_id,title,description,price,category,location,images) VALUES (?,?,?,?,?,?,?)')
+    .run(req.user.id, title.trim().slice(0,120), (description||'').trim().slice(0,5000), Math.max(0,parseInt(price)||0), category.trim(), (location||'').trim().slice(0,80), JSON.stringify(images));
+  const listing = db.prepare('SELECT l.*,u.name AS seller_name,u.phone AS seller_phone FROM listings l JOIN users u ON l.user_id=u.id WHERE l.id=?').get(result.lastInsertRowid);
+  res.status(201).json(fmtListing(listing,req.user));
 });
 
 app.delete('/api/listings/:id', auth, (req, res) => {
-  const listing = db.prepare('SELECT * FROM listings WHERE id = ? AND user_id = ?').get(req.params.id, req.user.id);
-  if (!listing) return res.status(404).json({ error: 'Hirdet√©s nem tal√°lhat√≥' });
-  JSON.parse(listing.images || '[]').forEach(img => {
-    const file = path.join(__dirname, 'public', img);
-    if (fs.existsSync(file)) try { fs.unlinkSync(file); } catch {}
-  });
-  db.prepare('DELETE FROM listings WHERE id = ?').run(req.params.id);
-  res.json({ ok: true });
+  const listing = db.prepare('SELECT * FROM listings WHERE id=? AND user_id=?').get(req.params.id,req.user.id);
+  if (!listing) return res.status(404).json({error:'HirdetÈs nem tal·lhatÛ'});
+  JSON.parse(listing.images||'[]').forEach(img=>{ try{ fs.unlinkSync(path.join(PUBLIC,img)); }catch{} });
+  db.prepare('DELETE FROM listings WHERE id=?').run(listing.id);
+  res.json({ok:true});
 });
 
-// ‚îÄ‚îÄ MESSAGES ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ
+// ¶¶ MESSAGES ¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶
 app.post('/api/listings/:id/message', (req, res) => {
-  const { sender_name, sender_email, message } = req.body || {};
-  if (!sender_name || !sender_email || !message) return res.status(400).json({ error: 'Minden mez≈ë kit√∂lt√©se k√∂telez≈ë' });
-  if (!isEmail(sender_email)) return res.status(400).json({ error: '√ârv√©nytelen email c√≠m' });
-  if (message.trim().length < 5) return res.status(400).json({ error: 'Az √ºzenet legal√°bb 5 karakter' });
-  const listing = db.prepare('SELECT id FROM listings WHERE id = ?').get(req.params.id);
-  if (!listing) return res.status(404).json({ error: 'Hirdet√©s nem tal√°lhat√≥' });
-  db.prepare(
-    'INSERT INTO messages (listing_id, sender_name, sender_email, message) VALUES (?,?,?,?)'
-  ).run(req.params.id, sender_name.trim(), sender_email.trim().toLowerCase(), message.trim());
-  res.json({ ok: true });
+  const { sender_name, sender_email, message } = req.body||{};
+  if (!sender_name||!sender_email||!message) return res.status(400).json({error:'Hi·nyzÛ adatok'});
+  if (!validateEmail(sender_email)) return res.status(400).json({error:'…rvÈnytelen email'});
+  if (typeof message!=='string'||message.trim().length<5) return res.status(400).json({error:'‹zenet t˙l rˆvid'});
+  const listing = db.prepare('SELECT id FROM listings WHERE id=?').get(req.params.id);
+  if (!listing) return res.status(404).json({error:'HirdetÈs nem tal·lhatÛ'});
+  db.prepare('INSERT INTO messages (listing_id,sender_name,sender_email,message) VALUES (?,?,?,?)')
+    .run(listing.id, sender_name.trim().slice(0,80), sender_email.trim().slice(0,120), message.trim().slice(0,2000));
+  res.json({ok:true});
 });
 
 app.get('/api/listings/:id/messages', auth, (req, res) => {
-  const listing = db.prepare('SELECT id, user_id FROM listings WHERE id = ?').get(req.params.id);
-  if (!listing) return res.status(404).json({ error: 'Hirdet√©s nem tal√°lhat√≥' });
-  if (listing.user_id !== req.user.id) return res.status(403).json({ error: 'Nincs jogosults√°g' });
-  const msgs = db.prepare('SELECT * FROM messages WHERE listing_id = ? ORDER BY created_at DESC').all(req.params.id);
-  db.prepare("UPDATE messages SET read=1 WHERE listing_id=?").run(req.params.id);
-  res.json(msgs);
+  const listing = db.prepare('SELECT id FROM listings WHERE id=? AND user_id=?').get(req.params.id,req.user.id);
+  if (!listing) return res.status(404).json({error:'HirdetÈs nem tal·lhatÛ'});
+  res.json(db.prepare('SELECT * FROM messages WHERE listing_id=? ORDER BY created_at DESC').all(listing.id));
 });
 
-// ‚îÄ‚îÄ STATS (for admin/testing) ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ
-app.get('/api/stats', (req, res) => {
-  res.json({
-    users:    db.prepare('SELECT COUNT(*) n FROM users').get().n,
-    listings: db.prepare("SELECT COUNT(*) n FROM listings WHERE status='active'").get().n,
-    messages: db.prepare('SELECT COUNT(*) n FROM messages').get().n,
-  });
+app.get('/api/stats', (_,res) => res.json({
+  users:    db.prepare('SELECT COUNT(*) n FROM users').get().n,
+  listings: db.prepare("SELECT COUNT(*) n FROM listings WHERE status='active'").get().n,
+  messages: db.prepare('SELECT COUNT(*) n FROM messages').get().n,
+}));
+
+// SPA fallback
+app.get('*', (_,res) => res.sendFile(path.join(PUBLIC,'index.html')));
+
+// Error handler
+app.use((err,_req,res,_next) => {
+  if (err.code==='LIMIT_FILE_SIZE') return res.status(400).json({error:'F·jl t˙l nagy (max 8 MB)'});
+  if (err.code==='LIMIT_FILE_COUNT') return res.status(400).json({error:'Max 6 kÈp'});
+  console.error(err);
+  res.status(400).json({error:err.message||'Szerver hiba'});
 });
 
-// ‚îÄ‚îÄ 404 fallback for SPA ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ
-app.get('*', (_, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
-
-// ‚îÄ‚îÄ START ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ
-app.listen(PORT, () => {
-  console.log(`\n  ü¶å Vad√°sz Apr√≥ fut: http://localhost:${PORT}\n`);
-});
+app.listen(PORT, () => console.log(`\n??  Vad·szAprÛ 2026  õ  http://localhost:${PORT}\n`));
