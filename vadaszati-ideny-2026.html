@@ -673,12 +673,61 @@
     }
 
     /* ── FOOTER ── */
-    footer{
-      text-align:center;margin-top:28px;
-      font-size:.7rem;color:rgba(255,255,255,.22);letter-spacing:.04em;
+    footer{margin-top:0;}
+    .footer-doc{
+      max-width:1200px;margin:40px auto 0;
+      border-top:1px solid rgba(255,0,0,.15);
+      padding-top:32px;
     }
-    footer a{color:rgba(255,0,0,.45);text-decoration:none;transition:color .15s}
-    footer a:hover{color:#ff0000}
+    .fdoc-title{
+      text-align:center;font-size:1rem;font-weight:900;
+      letter-spacing:.16em;text-transform:uppercase;
+      color:rgba(255,255,255,.55);margin-bottom:28px;
+    }
+    .fdoc-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+      gap:16px;
+      margin-bottom:32px;
+    }
+    .fdoc-card{
+      background:rgba(255,255,255,.025);
+      border:1px solid rgba(255,255,255,.07);
+      border-top:2px solid rgba(255,0,0,.35);
+      border-radius:10px;
+      padding:16px 18px 18px;
+    }
+    .fdoc-card-title{
+      font-size:.78rem;font-weight:700;color:#fff;
+      letter-spacing:.06em;text-transform:uppercase;
+      margin-bottom:10px;display:flex;align-items:center;gap:8px;
+    }
+    .fdoc-card-title span{font-size:1.1rem;}
+    .fdoc-card ul{
+      list-style:none;padding:0;margin:0;
+      display:flex;flex-direction:column;gap:5px;
+    }
+    .fdoc-card ul li{
+      font-size:.7rem;color:rgba(255,255,255,.5);
+      padding-left:12px;position:relative;line-height:1.4;
+    }
+    .fdoc-card ul li::before{
+      content:'›';position:absolute;left:0;
+      color:rgba(255,0,0,.6);font-weight:700;
+    }
+    .fdoc-card ul li b{color:rgba(255,255,255,.8);}
+    .footer-copy{
+      text-align:center;padding-bottom:28px;
+      font-size:.68rem;color:rgba(255,255,255,.18);letter-spacing:.04em;
+    }
+    .footer-copy a{color:rgba(255,0,0,.4);text-decoration:none;transition:color .15s}
+    .footer-copy a:hover{color:#ff0000}
+    @media(max-width:700px){
+      .fdoc-grid{grid-template-columns:1fr 1fr;}
+    }
+    @media(max-width:420px){
+      .fdoc-grid{grid-template-columns:1fr;}
+    }
 
     /* ── TODAY PANEL ── */
     .today-panel{
@@ -1228,6 +1277,113 @@
 </div>
 
 <footer>
+<div class="footer-doc">
+  <div class="fdoc-title">📖 Rendszer dokumentció &mdash; Mit tud ez az oldal?</div>
+  <div class="fdoc-grid">
+
+    <div class="fdoc-card">
+      <div class="fdoc-card-title"><span>📅</span> Vadászati naptár &ndash; Gantt nézet</div>
+      <ul>
+        <li><b>30+ vadfaj</b> vadászati idénye 2026-ra</li>
+        <li><b>9 csoport</b>: szarvasfélék, őz, muflon, vaddisznó, apróvad, szárnyasvad, vízi szárnyasvad, ragadozók</li>
+        <li>Csoportok <b>kattintásra össze/kibonthatók</b></li>
+        <li>Színkódok fajonként, vizulis sávok hónapokra osztva</li>
+        <li><b>Piros fűggőleges vonal</b> = mai nap helyzete</li>
+        <li>Jelmagyarázat az összes fajtacsoporthoz</li>
+      </ul>
+    </div>
+
+    <div class="fdoc-card">
+      <div class="fdoc-card-title"><span>⏱️</span> Valós idejű visszaszámlálók</div>
+      <ul>
+        <li>Minden fajnál <b>zöld villogó pont</b> ha most lőhető</li>
+        <li><b>Piros pont</b> ha tilalom van</li>
+        <li>Pontos visszamlálás: <b>naptól másodpercig</b></li>
+        <li>Néző mutatja: <em>» tilálom</em> vagy <em>» nyítás</em></li>
+        <li>Automatikusan frissül minden másodpercben</li>
+      </ul>
+    </div>
+
+    <div class="fdoc-card">
+      <div class="fdoc-card-title"><span>🌿</span> Ma vadászható panel</div>
+      <ul>
+        <li>Automatikusan listazza a <b>mai napon nyílt fajokat</b></li>
+        <li><b>Zölddel kiemelve</b> a mai napon megnyílt idnyek</li>
+        <li>−5 nap: <b>sürgeti figyelmeztetés</b></li>
+        <li>−14 nap: <b>sárga figyelmeztetés</b></li>
+        <li>Nárancs színnel: <b>hányi idő van még hátra</b> az idényből</li>
+        <li>„Hamarosan nyílik” szekció a következő 14 napra</li>
+      </ul>
+    </div>
+
+    <div class="fdoc-card">
+      <div class="fdoc-card-title"><span>🚨</span> Felugró értesítések</div>
+      <ul>
+        <li><b>Zöld popup</b>: ha aznap új vadászati idény nyílik &mdash; felsorolja az összes fajt</li>
+        <li><b>Piros popup</b>: ha 7 napon belül bármelyik idény lejár &mdash; visszaszámlálóval</li>
+        <li>Ha mindkettső aktv: egymás után jelennek meg</li>
+        <li>Kattintásra bezárhatók</li>
+      </ul>
+    </div>
+
+    <div class="fdoc-card">
+      <div class="fdoc-card-title"><span>🌕</span> Holdnaptár</div>
+      <ul>
+        <li><b>Valós holdállás</b> csillagászati számítással (szinodikus periódus)</li>
+        <li>Hónapos nézet ikonokkal és megvilágítási százalikkal</li>
+        <li><b>Mai nap kiemelve</b> piros kerettel</li>
+        <li>Telihold / újhold napok <b>arany kerettel</b></li>
+        <li><b>Világítási előre- és visszalapozás</b> hónapok között</li>
+        <li>Vadászati tanács az aktuális holdfázishoz</li>
+      </ul>
+    </div>
+
+    <div class="fdoc-card">
+      <div class="fdoc-card-title"><span>🕒</span> Óra &amp; Budapest időzóna</div>
+      <ul>
+        <li>Valós idejű <b>Budapest idő (CET/CEST)</b> automatikusan</li>
+        <li>Nyári/téli időszámítás <b>automatikus átváltás</b></li>
+        <li>Topbar óra másodpercenként frissül</li>
+        <li>Minden naptárszámítás a <b>mai BP dátumból</b> számítva</li>
+      </ul>
+    </div>
+
+    <div class="fdoc-card">
+      <div class="fdoc-card-title"><span>📱</span> Mobilbarát dizjn</div>
+      <ul>
+        <li>Teljes képernyőn átméreteződő elrendezés</li>
+        <li>Gantt táblázat <b>vízszintesen görgethő</b> mobilon</li>
+        <li>Holdnaptár és panelek <b>mobile-first</b> töréspontokkal</li>
+        <li>Topbar kompakt mobilnézeten</li>
+      </ul>
+    </div>
+
+    <div class="fdoc-card">
+      <div class="fdoc-card-title"><span>🎥</span> Hero videó &amp; vizulis effektek</div>
+      <ul>
+        <li>Teljes szélességű <b>MP4 hero videó</b> az oldal tetején</li>
+        <li><b>TikTok-stílusú glitch effekt</b> a címre (3 réteges CSS)</li>
+        <li>Belépő <b>logo splash képernyő</b> golyyszóró animációval</li>
+        <li>Scroll <b>haladásjelző sáv</b> a topbaron (fekete alap, piros)</li>
+        <li>Pulszáló <b>HUD-stílusú topbar</b> 2026-os dizjnnal</li>
+      </ul>
+    </div>
+
+    <div class="fdoc-card">
+      <div class="fdoc-card-title"><span>⚖️</span> Jogi &amp; impresszum</div>
+      <ul>
+        <li>Fejlesztő: <b>Koltai Norbert</b> &mdash; Smart Device Hungary Kft.</li>
+        <li>Második fejlesztő: <b>Lévai László</b></li>
+        <li>Jogalap: <b>79/2004. (V.4.) FVM rendelet</b></li>
+        <li>Impresszum, Adatvédelem, Licenc modaldokban</li>
+        <li>Facebook csoport: Vadár éjszakai lesvadászat</li>
+        <li>Tárhelysz. : Nethely Kft.</li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+<div class="footer-copy">
   &copy; 2026 <a href="https://www.infostudio.hu" target="_blank">InfoStudio</a>
   &nbsp;&mdash;&nbsp;
   <a href="#" onclick="openModal('impresszum');return false;">Impresszum</a>
@@ -1239,6 +1395,7 @@
   <a href="https://www.vabi.hu" target="_blank">vabi.hu</a>
   &nbsp;&mdash;&nbsp;
   Forrás: 79/2004. (V.4.) FVM rendelet &nbsp;|&nbsp; Nem helyettesíti a hatályos jogszabályokat.
+</div>
 </footer>
 
 <script>
