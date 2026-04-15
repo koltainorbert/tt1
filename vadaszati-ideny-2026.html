@@ -629,11 +629,11 @@ function buildTodayPanel(){
     grid.className='tp-grid';
     for(const a of open){
       let bc,bt;
-      if(a.isNew){bc='b-new';bt='&#127881; Ma nyílt ki!';}
+      if(a.isNew){bc='b-new';bt='&#127881; Feloldva ma';}
       else if(a.daysLeft===0){bc='b-urgent';bt='&#9888; Ma az utolsó nap!';}
-      else if(a.daysLeft<=5){bc='b-urgent';bt=`&#9888; Még ${a.daysLeft} nap! – zár: ${a.closing}`;}
-      else if(a.daysLeft<=14){bc='b-warn';bt=`Még ${a.daysLeft} nap – zár: ${a.closing}`;}
-      else{bc='b-ok';bt=`Zárás: ${a.closing} (${a.daysLeft} nap)`;}
+      else if(a.daysLeft<=5){bc='b-urgent';bt=`&#9888; Még ${a.daysLeft} nap! – Utolsó vadászati nap: ${a.closing}`;}
+      else if(a.daysLeft<=14){bc='b-warn';bt=`Még ${a.daysLeft} nap – Utolsó vadászati nap: ${a.closing}`;}
+      else{bc='b-ok';bt=`Utolsó vadászati nap: ${a.closing} (${a.daysLeft} nap)`;}
       const card=document.createElement('div');
       card.className='tp-card';
       card.style.borderLeftColor=a.color;
