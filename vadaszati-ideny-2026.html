@@ -51,12 +51,91 @@
       text-align:center;
     }
     #hero-title{
+      position:relative;
       font-size:clamp(2rem,7vw,5rem);
       font-weight:900;letter-spacing:.15em;text-transform:uppercase;
-      color:#fff;text-shadow:0 2px 40px rgba(0,0,0,.9),0 0 80px rgba(255,0,0,.3);
+      color:#fff;
       line-height:1.05;
+      display:inline-block;
     }
     #hero-title span{color:#ff0000}
+
+    /* ── TIKTOK GLITCH ── */
+    #hero-title::before,
+    #hero-title::after{
+      content:attr(data-text);
+      position:absolute;
+      inset:0;
+      font:inherit;letter-spacing:inherit;
+      pointer-events:none;
+      will-change:transform,opacity,clip-path;
+    }
+    #hero-title::before{
+      color:#ff0000;
+      animation:glitch-r 2.4s steps(1) infinite;
+    }
+    #hero-title::after{
+      color:#00e5ff;
+      animation:glitch-b 2.4s steps(1) infinite;
+    }
+    @keyframes glitch-r{
+      0%,89%         {transform:none;clip-path:none;opacity:0}
+      90%            {opacity:1;transform:translate(-4px,0);clip-path:polygon(0 20%,100% 20%,100% 35%,0 35%)}
+      90.015%        {transform:translate(3px, 1px);clip-path:polygon(0 55%,100% 55%,100% 65%,0 65%)}
+      90.03%         {transform:translate(-6px,-1px);clip-path:polygon(0 70%,100% 70%,100% 80%,0 80%)}
+      90.045%        {transform:translate(2px,0);clip-path:polygon(0 0,100% 0,100% 15%,0 15%)}
+      90.06%         {transform:translate(-3px,1px);clip-path:polygon(0 40%,100% 40%,100% 55%,0 55%)}
+      90.075%        {opacity:0;transform:none;clip-path:none}
+      94%            {opacity:1;transform:translate(5px,0);clip-path:polygon(0 60%,100% 60%,100% 75%,0 75%)}
+      94.015%        {transform:translate(-4px,-2px);clip-path:polygon(0 10%,100% 10%,100% 25%,0 25%)}
+      94.03%         {opacity:0;transform:none;clip-path:none}
+      100%           {opacity:0}
+    }
+    @keyframes glitch-b{
+      0%,89%         {transform:none;clip-path:none;opacity:0}
+      90%            {opacity:1;transform:translate(4px,0);clip-path:polygon(0 30%,100% 30%,100% 45%,0 45%)}
+      90.015%        {transform:translate(-3px,2px);clip-path:polygon(0 65%,100% 65%,100% 75%,0 75%)}
+      90.03%         {transform:translate(5px,-1px);clip-path:polygon(0 5%,100% 5%,100% 20%,0 20%)}
+      90.045%        {transform:translate(-2px,0);clip-path:polygon(0 80%,100% 80%,100% 95%,0 95%)}
+      90.06%         {opacity:0;transform:none;clip-path:none}
+      93%            {opacity:1;transform:translate(-5px,1px);clip-path:polygon(0 45%,100% 45%,100% 60%,0 60%)}
+      93.015%        {transform:translate(3px,-1px);clip-path:polygon(0 15%,100% 15%,100% 30%,0 30%)}
+      93.03%         {opacity:0;transform:none;clip-path:none}
+      100%           {opacity:0}
+    }
+
+    /* scan-line flicker on hero during glitch */
+    @keyframes glitch-scan{
+      0%,88%  {opacity:0}
+      90%     {opacity:.18}
+      90.08%  {opacity:0}
+      93%     {opacity:.12}
+      93.06%  {opacity:0}
+      100%    {opacity:0}
+    }
+    #hero-scanline{
+      position:absolute;inset:0;z-index:3;pointer-events:none;
+      background:repeating-linear-gradient(
+        0deg,
+        transparent,transparent 2px,
+        rgba(0,255,255,.07) 2px,rgba(0,255,255,.07) 4px
+      );
+      animation:glitch-scan 2.4s steps(1) infinite;
+    }
+
+    /* whole-hero shake on glitch */
+    @keyframes glitch-shake{
+      0%,88%  {transform:none}
+      90%     {transform:translate(-3px,1px) skewX(-1deg)}
+      90.015% {transform:translate(4px,-1px) skewX(.8deg)}
+      90.03%  {transform:translate(-2px,2px)}
+      90.05%  {transform:none}
+      93%     {transform:translate(3px,0) skewX(.5deg)}
+      93.02%  {transform:none}
+      100%    {transform:none}
+    }
+    #hero{ animation:glitch-shake 2.4s steps(1) infinite; }
+
     #hero-sub{
       font-size:clamp(.7rem,1.8vw,.95rem);
       color:rgba(255,255,255,.55);letter-spacing:.1em;
