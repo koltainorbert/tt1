@@ -366,7 +366,7 @@
     }
     #intro-bg{
       position:absolute;inset:0;
-      background:radial-gradient(ellipse at center, rgba(80,30,0,.85) 0%, rgba(0,0,0,1) 70%);
+      background:#000;
     }
     /* scanlines */
     #intro::before{
@@ -375,68 +375,79 @@
       background:repeating-linear-gradient(
         0deg,
         transparent,transparent 2px,
-        rgba(0,0,0,.18) 2px,rgba(0,0,0,.18) 4px
+        rgba(0,0,0,.12) 2px,rgba(0,0,0,.12) 4px
       );
       pointer-events:none;
     }
     #intro-logo{
-      position:absolute;inset:0;z-index:5;
-      width:100%;height:100%;
+      position:absolute;
+      top:0;left:0;
+      width:100vw;height:100vh;
+      width:100dvw;height:100dvh;
       object-fit:cover;
-      object-position:center;
-      animation:logoDrop 1.1s cubic-bezier(.16,1,.3,1) .1s both;
+      object-position:center center;
+      z-index:5;
+      display:block;
+      animation:logoDrop 1s ease .1s both;
     }
     @keyframes logoDrop{
-      0%{opacity:0;transform:scale(1.08);}
-      100%{opacity:1;transform:scale(1);}
+      from{opacity:0;transform:scale(1.06);}
+      to{opacity:1;transform:scale(1);}
     }
-    #intro-tagline{
-      position:relative;z-index:5;
-      margin-top:24px;
-      font-family:'Segoe UI',Arial,sans-serif;
-      font-size:clamp(.75rem,2.5vw,1.1rem);
-      font-weight:700;
-      letter-spacing:.35em;
-      text-transform:uppercase;
-      color:rgba(255,180,50,.9);
-      text-shadow:0 0 20px rgba(255,100,0,.8),0 0 60px rgba(255,50,0,.4);
-      animation:taglineIn .7s ease .9s both;
-    }
-    @keyframes taglineIn{
-      from{opacity:0;letter-spacing:.6em;}
-      to{opacity:1;letter-spacing:.35em;}
-    }
-    #intro-skip{
-      position:relative;z-index:5;
-      margin-top:32px;
-      font-family:'Segoe UI',Arial,sans-serif;
-      font-size:.7rem;letter-spacing:.18em;
-      color:rgba(255,255,255,.25);
-      animation:skipPulse 1.2s ease 1.6s both;
-      text-transform:uppercase;
-    }
-    @keyframes skipPulse{
-      0%{opacity:0;} 100%{opacity:1;}
-    }
+    /* timer bar — bottom of screen, always visible */
     #intro-timer{
-      position:relative;z-index:5;
-      margin-top:8px;
-      width:180px;height:2px;
-      background:rgba(255,255,255,.08);
-      border-radius:2px;
-      overflow:hidden;
-      animation:skipPulse 1.2s ease 1.6s both;
+      position:absolute;
+      bottom:0;left:0;right:0;
+      height:5px;
+      background:rgba(0,0,0,.4);
+      z-index:20;
     }
     #intro-timer-bar{
-      height:100%;width:100%;
-      background:linear-gradient(90deg,#ff4400,#ffaa00);
+      height:100%;
+      width:100%;
+      background:linear-gradient(90deg,#ff2200,#ff8800,#ffdd00);
       transform-origin:left;
-      animation:timerBar 3.5s linear 1.6s forwards;
+      box-shadow:0 0 12px #ff4400, 0 0 24px #ff220066;
+      animation:timerBar 5s linear .5s forwards;
     }
     @keyframes timerBar{
-      from{transform:scaleX(1);} to{transform:scaleX(0);}
+      from{transform:scaleX(1);}
+      to{transform:scaleX(0);}
     }
-
+    /* tap hint */
+    #intro-hint{
+      position:absolute;
+      bottom:20px;left:50%;transform:translateX(-50%);
+      z-index:20;
+      font-family:'Segoe UI',Arial,sans-serif;
+      font-size:clamp(.65rem,2vw,.8rem);
+      letter-spacing:.2em;
+      text-transform:uppercase;
+      color:rgba(255,255,255,.45);
+      animation:hintBlink 1.2s ease 2s both;
+      white-space:nowrap;
+    }
+    @keyframes hintBlink{
+      0%{opacity:0;} 60%{opacity:1;} 80%{opacity:.3;} 100%{opacity:.7;}
+    }
+    /* bullet hole SVG overlay */
+    #bullet-overlay{
+      position:absolute;inset:0;z-index:30;
+      pointer-events:none;
+      display:none;
+    }
+    /* crack lines canvas */
+    #crack-canvas{
+      position:absolute;inset:0;z-index:28;
+      pointer-events:none;
+    }
+    /* flash */
+    #gun-flash{
+      position:absolute;inset:0;z-index:35;
+      background:#fff;
+      opacity:0;
+      pointer-events:none;
+    }
     /* FIRE PARTICLES */
     .spark{
       position:absolute;
@@ -453,79 +464,160 @@
   <div id="intro-bg"></div>
   <canvas id="intro-canvas" style="position:absolute;inset:0;z-index:4;pointer-events:none;"></canvas>
   <img id="intro-logo" src="671303117_10236971218234012_2276220733352520771_n.jpg" alt="VADKÁR VADÁSZ 2026">
-  <div id="intro-skip">Kattints a belépéshez — vagy várj</div>
+  <canvas id="crack-canvas"></canvas>
+  <div id="gun-flash"></div>
   <div id="intro-timer"><div id="intro-timer-bar"></div></div>
+  <div id="intro-hint">Koppints a belépéshez</div>
 </div>
 
 <script>
 // ── INTRO LOGIC
 (function(){
   const intro=document.getElementById('intro');
-  const canvas=document.getElementById('intro-canvas');
-  const ctx=canvas.getContext('2d');
+  const fireCanvas=document.getElementById('intro-canvas');
+  const crackCanvas=document.getElementById('crack-canvas');
+  const flash=document.getElementById('gun-flash');
+  const fCtx=fireCanvas.getContext('2d');
+  const cCtx=crackCanvas.getContext('2d');
   let raf,dismissed=false;
 
   function resize(){
-    canvas.width=window.innerWidth;
-    canvas.height=window.innerHeight;
+    fireCanvas.width=crackCanvas.width=window.innerWidth;
+    fireCanvas.height=crackCanvas.height=window.innerHeight;
   }
   resize();
   window.addEventListener('resize',resize);
 
-  // Particles
+  // ── Fire sparks
   const particles=[];
   function mkParticle(){
-    const x=Math.random()*canvas.width;
-    const y=canvas.height+10;
-    const size=Math.random()*4+1;
-    const speed=Math.random()*2+1;
-    const life=Math.random()*80+60;
-    const hue=Math.random()*40+10; // orange-yellow
-    particles.push({x,y,size,speed,life,maxLife:life,hue,dx:(Math.random()-.5)*1.2});
+    particles.push({
+      x:Math.random()*fireCanvas.width,
+      y:fireCanvas.height+10,
+      size:Math.random()*3.5+.8,
+      speed:Math.random()*1.8+.8,
+      life:Math.random()*70+50,
+      maxLife:0,
+      hue:Math.random()*35+8,
+      dx:(Math.random()-.5)*1
+    });
+    particles[particles.length-1].maxLife=particles[particles.length-1].life;
   }
-
-  function drawParticles(){
-    ctx.clearRect(0,0,canvas.width,canvas.height);
+  function drawSparks(){
+    fCtx.clearRect(0,0,fireCanvas.width,fireCanvas.height);
     for(let i=particles.length-1;i>=0;i--){
       const p=particles[i];
-      p.y-=p.speed;
-      p.x+=p.dx;
-      p.life--;
+      p.y-=p.speed; p.x+=p.dx; p.life--;
       if(p.life<=0){particles.splice(i,1);continue;}
-      const alpha=(p.life/p.maxLife)*0.85;
+      const a=(p.life/p.maxLife)*.7;
       const r=p.size*(p.life/p.maxLife);
-      const grd=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,r*3);
-      grd.addColorStop(0,`hsla(${p.hue},100%,90%,${alpha})`);
-      grd.addColorStop(.5,`hsla(${p.hue},100%,60%,${alpha*.6})`);
-      grd.addColorStop(1,`hsla(${p.hue},100%,40%,0)`);
-      ctx.beginPath();
-      ctx.arc(p.x,p.y,r*3,0,Math.PI*2);
-      ctx.fillStyle=grd;
-      ctx.fill();
+      const g=fCtx.createRadialGradient(p.x,p.y,0,p.x,p.y,r*3);
+      g.addColorStop(0,`hsla(${p.hue},100%,92%,${a})`);
+      g.addColorStop(.5,`hsla(${p.hue},100%,58%,${a*.5})`);
+      g.addColorStop(1,`hsla(${p.hue},100%,38%,0)`);
+      fCtx.beginPath();
+      fCtx.arc(p.x,p.y,r*3,0,Math.PI*2);
+      fCtx.fillStyle=g;
+      fCtx.fill();
     }
   }
-
   let lastSpawn=0;
   function loop(ts){
     if(dismissed) return;
-    if(ts-lastSpawn>18){mkParticle();mkParticle();lastSpawn=ts;}
-    drawParticles();
+    if(ts-lastSpawn>22){mkParticle();mkParticle();lastSpawn=ts;}
+    drawSparks();
     raf=requestAnimationFrame(loop);
   }
   requestAnimationFrame(loop);
 
-  // Dismiss
-  function dismiss(){
+  // ── Bullet shatter effect
+  function shootEffect(cx,cy){
+    // White flash
+    flash.style.transition='none';
+    flash.style.opacity='.85';
+    setTimeout(()=>{
+      flash.style.transition='opacity .35s ease';
+      flash.style.opacity='0';
+    },60);
+
+    // Crack lines from hit point
+    const w=crackCanvas.width, h=crackCanvas.height;
+    cCtx.clearRect(0,0,w,h);
+    const numCracks=14+Math.floor(Math.random()*8);
+    for(let i=0;i<numCracks;i++){
+      const angle=(Math.PI*2/numCracks)*i + (Math.random()-.5)*.4;
+      const len=(Math.random()*.45+.25)*Math.min(w,h);
+      const segs=Math.floor(Math.random()*4)+3;
+      cCtx.beginPath();
+      cCtx.moveTo(cx,cy);
+      let px=cx,py=cy;
+      for(let s=0;s<segs;s++){
+        const segLen=len/segs*(Math.random()*.5+.7);
+        const jitter=(Math.random()-.5)*.35;
+        px+=Math.cos(angle+jitter)*segLen;
+        py+=Math.sin(angle+jitter)*segLen;
+        cCtx.lineTo(px,py);
+        // branch
+        if(s===1&&Math.random()>.4){
+          const ba=angle+(Math.random()-.5)*1.2;
+          const bl=segLen*(Math.random()*.5+.2);
+          const bx2=px+Math.cos(ba)*bl, by2=py+Math.sin(ba)*bl;
+          cCtx.moveTo(px,py);
+          cCtx.lineTo(bx2,by2);
+          cCtx.moveTo(px,py);
+        }
+      }
+      const alpha=Math.random()*.6+.3;
+      cCtx.strokeStyle=`rgba(255,255,255,${alpha})`;
+      cCtx.lineWidth=Math.random()*2.5+.5;
+      cCtx.lineCap='round';
+      cCtx.stroke();
+    }
+    // bullet hole circle
+    const r1=Math.min(w,h)*.025;
+    const g2=cCtx.createRadialGradient(cx,cy,0,cx,cy,r1*2);
+    g2.addColorStop(0,'rgba(0,0,0,1)');
+    g2.addColorStop(.5,'rgba(20,10,0,.9)');
+    g2.addColorStop(1,'rgba(0,0,0,0)');
+    cCtx.beginPath();
+    cCtx.arc(cx,cy,r1*2,0,Math.PI*2);
+    cCtx.fillStyle=g2;
+    cCtx.fill();
+    // glass shards glow
+    const g3=cCtx.createRadialGradient(cx,cy,r1*.3,cx,cy,r1*3.5);
+    g3.addColorStop(0,'rgba(255,220,100,.5)');
+    g3.addColorStop(1,'rgba(255,80,0,0)');
+    cCtx.beginPath();
+    cCtx.arc(cx,cy,r1*3.5,0,Math.PI*2);
+    cCtx.fillStyle=g3;
+    cCtx.fill();
+  }
+
+  // ── Dismiss
+  function dismiss(e){
     if(dismissed) return;
     dismissed=true;
+    const rect=intro.getBoundingClientRect();
+    let cx,cy;
+    if(e&&(e.clientX||e.touches)){
+      const t=e.touches?e.touches[0]:e;
+      cx=t.clientX-rect.left; cy=t.clientY-rect.top;
+    } else {
+      cx=crackCanvas.width/2; cy=crackCanvas.height*0.42;
+    }
     cancelAnimationFrame(raf);
-    intro.classList.add('fade-out');
-    setTimeout(()=>intro.remove(),950);
+    shootEffect(cx,cy);
+    setTimeout(()=>{
+      intro.style.transition='opacity .7s ease, transform .7s ease';
+      intro.style.opacity='0';
+      intro.style.transform='scale(1.05)';
+      setTimeout(()=>intro.remove(),720);
+    },280);
   }
 
   intro.addEventListener('click',dismiss);
-  // Auto dismiss after 3.5s intro anim + 1.6s delay = 5.1s
-  setTimeout(dismiss,5200);
+  intro.addEventListener('touchend',function(e){e.preventDefault();dismiss(e);},{passive:false});
+  setTimeout(()=>dismiss(null),5600);
 })();
 </script>
 
