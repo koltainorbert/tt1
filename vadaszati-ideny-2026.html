@@ -378,12 +378,19 @@
       font-size:.88rem;
     }
     /* scroll progress bar */
+    /* progress bar track (fekete alap) */
+    .topbar::before{
+      content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
+      background:#000;
+      z-index:0;
+      pointer-events:none;
+    }
     .topbar-scan{
       position:absolute;bottom:0;left:0;z-index:1;
       width:0%;height:2px;
       background:linear-gradient(90deg,#ff0000,#ff4400,#ff0000);
-      box-shadow:0 0 6px #ff0000,0 0 12px #ff000066;
-      transition:width .1s linear;
+      box-shadow:0 0 6px #ff0000,0 0 14px #ff000099;
+      transition:width .12s linear;
       pointer-events:none;
     }
 
@@ -452,7 +459,7 @@
     }
     .topbar-links a::after{
       content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
-      background:#ff0000;transform:scaleX(0);
+      background:#fff;transform:scaleX(0);
       transition:transform .18s;
     }
     .topbar-links a:hover{color:#fff;background:rgba(255,0,0,.08);}
