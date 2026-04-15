@@ -773,8 +773,9 @@
     <source src="521380_Gun_Woman_1920x1080.mp4" type="video/mp4">
   </video>
   <div id="hero-overlay"></div>
+  <div id="hero-scanline"></div>
   <div id="hero-content">
-    <div id="hero-title">VADKÁR <span>VADÁSZ</span></div>
+    <div id="hero-title" data-text="VADKÁR VADÁSZ">VADKÁR <span>VADÁSZ</span></div>
     <div id="hero-sub">Vadászati idények 2026 &nbsp;·&nbsp; Magyarország &nbsp;·&nbsp; Magyar vadászati naptár</div>
   </div>
 </div>
@@ -862,6 +863,65 @@ document.getElementById('ham-btn').addEventListener('click',()=>{
 document.addEventListener('click',e=>{
   if(!e.target.closest('#topbar-menu')&&!e.target.closest('#ham-btn'))closeMenu();
 });
+
+// ── TIKTOK GLITCH – JS extra réteg (15ms brutalitás) ───────
+(function(){
+  const el=document.getElementById('hero-title');
+  if(!el) return;
+  const CLIPS=[
+    'polygon(0 0,100% 0,100% 12%,0 12%)',
+    'polygon(0 18%,100% 18%,100% 33%,0 33%)',
+    'polygon(0 40%,100% 40%,100% 58%,0 58%)',
+    'polygon(0 62%,100% 62%,100% 78%,0 78%)',
+    'polygon(0 82%,100% 82%,100% 100%,0 100%)',
+    'polygon(0 5%,100% 5%,100% 22%,0 22%)',
+    'polygon(0 50%,100% 50%,100% 70%,0 70%)',
+  ];
+  let lastGlitch=0;
+  let glitchInterval=null;
+
+  function randInt(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
+
+  function fireGlitch(){
+    // burst: 4-8 fázis, egyenként 15ms
+    const phases=randInt(4,8);
+    let i=0;
+    function step(){
+      if(i>=phases){
+        el.style.transform='';
+        el.style.filter='';
+        clearInterval(glitchInterval);
+        glitchInterval=null;
+        // reset CSS vars
+        el.style.setProperty('--gx','0px');
+        el.style.setProperty('--gy','0px');
+        return;
+      }
+      const tx=randInt(-8,8), ty=randInt(-2,2);
+      const skew=( Math.random()>.6?(Math.random()-.5)*3:0 );
+      const bright=Math.random()>.7?(Math.random()*.8+.6):1;
+      el.style.transform=`translate(${tx}px,${ty}px) skewX(${skew}deg)`;
+      el.style.filter=`brightness(${bright}) saturate(${randInt(80,200)}%)`;
+      // clip jitter via CSS custom props (pseudo uses them)
+      el.style.setProperty('--clip1',CLIPS[randInt(0,CLIPS.length-1)]);
+      el.style.setProperty('--clip2',CLIPS[randInt(0,CLIPS.length-1)]);
+      i++;
+    }
+    step();
+    glitchInterval=setInterval(step,15);
+  }
+
+  function scheduleNext(){
+    // random 800–3500ms között következő glitch
+    const delay=randInt(800,3500);
+    setTimeout(()=>{
+      fireGlitch();
+      scheduleNext();
+    },delay);
+  }
+  // első glitch gyorsan jön be
+  setTimeout(()=>{ fireGlitch(); scheduleNext(); },600);
+})();
 
 const YEAR = 2026;
 function isLeap(y){return(y%4===0&&y%100!==0)||(y%400===0)}
