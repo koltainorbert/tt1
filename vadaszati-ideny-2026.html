@@ -59,69 +59,164 @@
       color:#fff;
       line-height:1.05;
       display:inline-block;
+      animation:ttg-main 8s linear infinite;
     }
     #hero-title span{color:#ff0000}
 
-    /* ── TIKTOK GLITCH ── */
-    #hero-title::before,
+    /* ── TIKTOK GLITCH — 3 réteg, drop-shadow kromatikus aberráció ── */
+    /* Piros csatorna pseudo */
+    #hero-title::before{
+      content:attr(data-text);
+      position:absolute;inset:0;
+      font:inherit;letter-spacing:inherit;color:#ff2200;
+      pointer-events:none;
+      opacity:0;
+      animation:ttg-red 8s linear infinite;
+      text-shadow:none;
+    }
+    /* Cián csatorna pseudo */
     #hero-title::after{
       content:attr(data-text);
-      position:absolute;
-      inset:0;
-      font:inherit;letter-spacing:inherit;
+      position:absolute;inset:0;
+      font:inherit;letter-spacing:inherit;color:#00e5ff;
       pointer-events:none;
-    }
-    #hero-title::before{
-      color:#ff0000;
-      animation:glitch-r 2.4s steps(1) infinite;
-    }
-    #hero-title::after{
-      color:#00e5ff;
-      animation:glitch-b 2.4s steps(1) infinite;
-    }
-    @keyframes glitch-r{
-      0%,89%         {transform:none;clip-path:none;opacity:0}
-      90%            {opacity:1;transform:translate(-4px,0);clip-path:polygon(0 20%,100% 20%,100% 35%,0 35%)}
-      90.015%        {transform:translate(3px, 1px);clip-path:polygon(0 55%,100% 55%,100% 65%,0 65%)}
-      90.03%         {transform:translate(-6px,-1px);clip-path:polygon(0 70%,100% 70%,100% 80%,0 80%)}
-      90.045%        {transform:translate(2px,0);clip-path:polygon(0 0,100% 0,100% 15%,0 15%)}
-      90.06%         {transform:translate(-3px,1px);clip-path:polygon(0 40%,100% 40%,100% 55%,0 55%)}
-      90.075%        {opacity:0;transform:none;clip-path:none}
-      94%            {opacity:1;transform:translate(5px,0);clip-path:polygon(0 60%,100% 60%,100% 75%,0 75%)}
-      94.015%        {transform:translate(-4px,-2px);clip-path:polygon(0 10%,100% 10%,100% 25%,0 25%)}
-      94.03%         {opacity:0;transform:none;clip-path:none}
-      100%           {opacity:0}
-    }
-    @keyframes glitch-b{
-      0%,89%         {transform:none;clip-path:none;opacity:0}
-      90%            {opacity:1;transform:translate(4px,0);clip-path:polygon(0 30%,100% 30%,100% 45%,0 45%)}
-      90.015%        {transform:translate(-3px,2px);clip-path:polygon(0 65%,100% 65%,100% 75%,0 75%)}
-      90.03%         {transform:translate(5px,-1px);clip-path:polygon(0 5%,100% 5%,100% 20%,0 20%)}
-      90.045%        {transform:translate(-2px,0);clip-path:polygon(0 80%,100% 80%,100% 95%,0 95%)}
-      90.06%         {opacity:0;transform:none;clip-path:none}
-      93%            {opacity:1;transform:translate(-5px,1px);clip-path:polygon(0 45%,100% 45%,100% 60%,0 60%)}
-      93.015%        {transform:translate(3px,-1px);clip-path:polygon(0 15%,100% 15%,100% 30%,0 30%)}
-      93.03%         {opacity:0;transform:none;clip-path:none}
-      100%           {opacity:0}
+      opacity:0;
+      animation:ttg-cyan 8s linear infinite;
+      text-shadow:none;
     }
 
-    /* scan-line flicker on hero during glitch */
-    @keyframes glitch-scan{
-      0%,88%  {opacity:0}
-      90%     {opacity:.18}
-      90.08%  {opacity:0}
-      93%     {opacity:.12}
-      93.06%  {opacity:0}
-      100%    {opacity:0}
+    /* Fő glitch: skewX + drop-shadow burst, 8s ciklus */
+    @keyframes ttg-main{
+      0%,34%,72%,100%{transform:none;filter:none;}
+      /* 1. hullám */
+      35%{transform:translateX(-11px) skewX(-9deg);
+          filter:drop-shadow(11px 0 rgba(255,0,0,1)) drop-shadow(-11px 0 rgba(0,220,255,1));}
+      36%{transform:translateX(14px) skewX(8deg);
+          filter:drop-shadow(-13px 0 rgba(255,0,0,1)) drop-shadow(13px 0 rgba(0,220,255,1));}
+      37%{transform:translateX(-9px) skewX(-11deg);
+          filter:drop-shadow(9px 0 rgba(255,0,0,.9)) drop-shadow(-9px 0 rgba(0,220,255,.9));}
+      38%{transform:translateX(7px) skewX(5deg);
+          filter:drop-shadow(-6px 0 rgba(255,0,0,.7)) drop-shadow(6px 0 rgba(0,220,255,.6));}
+      39%{transform:none;filter:none;}
+      /* 2. hullám — csúcsintenzitás */
+      42%{transform:translateX(-20px) skewX(-15deg);
+          filter:drop-shadow(20px 0 rgba(255,0,0,1)) drop-shadow(-20px 0 rgba(0,220,255,1)) brightness(1.5);}
+      43%{transform:translateX(18px) skewX(12deg);
+          filter:drop-shadow(-18px 0 rgba(255,0,0,1)) drop-shadow(18px 0 rgba(0,220,255,1));}
+      44%{transform:translateX(-13px) skewX(-8deg);
+          filter:drop-shadow(13px 0 rgba(255,0,0,.85)) drop-shadow(-7px 0 rgba(0,220,255,.7));}
+      45%{transform:translateX(8px);filter:drop-shadow(-5px 0 rgba(0,220,255,.5));}
+      46%{transform:none;filter:none;}
+      /* 3. hullám */
+      50%{transform:translateX(-15px) skewX(-11deg);
+          filter:drop-shadow(15px 0 rgba(255,0,0,.95)) drop-shadow(-15px 0 rgba(0,220,255,.85));}
+      51%{transform:translateX(12px) skewX(9deg);
+          filter:drop-shadow(-12px 0 rgba(255,0,0,.8)) drop-shadow(10px 0 rgba(0,220,255,.6));}
+      52%{transform:translateX(-7px) skewX(-4deg);
+          filter:drop-shadow(7px 0 rgba(255,0,0,.6));}
+      53%{transform:none;filter:none;}
+      /* 4. hullám — elhaló */
+      57%{transform:translateX(-9px) skewX(-6deg);
+          filter:drop-shadow(9px 0 rgba(255,0,0,.65)) drop-shadow(-6px 0 rgba(0,220,255,.5));}
+      58%{transform:translateX(6px) skewX(4deg);
+          filter:drop-shadow(-5px 0 rgba(255,0,0,.45));}
+      59%{transform:none;filter:none;}
+      /* 5. hullám — mikrozaj */
+      62%{transform:translateX(-4px);
+          filter:drop-shadow(4px 0 rgba(255,0,0,.35)) drop-shadow(-3px 0 rgba(0,220,255,.3));}
+      63%{transform:translateX(3px);}
+      64%{transform:none;filter:none;}
     }
+
+    /* Piros csatorna JOBBRA */
+    @keyframes ttg-red{
+      0%,34%,72%,100%{transform:none;opacity:0}
+      35%{transform:translateX(28px);opacity:.95}
+      36%{transform:translateX(-34px);opacity:.95}
+      37%{transform:translateX(26px);opacity:.9}
+      38%{transform:translateX(-30px);opacity:.9}
+      39%{transform:none;opacity:0}
+      42%{transform:translateX(-42px);opacity:1}
+      43%{transform:translateX(50px);opacity:1}
+      44%{transform:translateX(-37px);opacity:.95}
+      45%{transform:translateX(44px);opacity:.95}
+      46%{transform:none;opacity:0}
+      50%{transform:translateX(34px);opacity:.9}
+      51%{transform:translateX(-40px);opacity:.9}
+      52%{transform:translateX(28px);opacity:.85}
+      53%{transform:none;opacity:0}
+      57%{transform:translateX(-22px);opacity:.75}
+      58%{transform:translateX(18px);opacity:.7}
+      59%{transform:none;opacity:0}
+      62%{transform:translateX(10px);opacity:.5}
+      63%{transform:translateX(-8px);opacity:.4}
+      64%{transform:none;opacity:0}
+    }
+
+    /* Cián csatorna BALRA */
+    @keyframes ttg-cyan{
+      0%,34%,72%,100%{transform:none;opacity:0}
+      35%{transform:translateX(-28px);opacity:.75}
+      36%{transform:translateX(34px);opacity:.75}
+      37%{transform:translateX(-26px);opacity:.7}
+      38%{transform:translateX(30px);opacity:.7}
+      39%{transform:none;opacity:0}
+      42%{transform:translateX(42px);opacity:.85}
+      43%{transform:translateX(-50px);opacity:.85}
+      44%{transform:translateX(37px);opacity:.8}
+      45%{transform:translateX(-44px);opacity:.8}
+      46%{transform:none;opacity:0}
+      50%{transform:translateX(-34px);opacity:.75}
+      51%{transform:translateX(40px);opacity:.75}
+      52%{transform:translateX(-28px);opacity:.7}
+      53%{transform:none;opacity:0}
+      57%{transform:translateX(22px);opacity:.6}
+      58%{transform:translateX(-18px);opacity:.55}
+      59%{transform:none;opacity:0}
+      62%{transform:translateX(-10px);opacity:.35}
+      63%{transform:translateX(8px);opacity:.3}
+      64%{transform:none;opacity:0}
+    }
+
+    /* piros/cián scan-csíkok */
     #hero-scanline{
       position:absolute;inset:0;z-index:3;pointer-events:none;
-      background:repeating-linear-gradient(
-        0deg,
-        transparent,transparent 2px,
-        rgba(0,255,255,.07) 2px,rgba(0,255,255,.07) 4px
-      );
-      animation:glitch-scan 2.4s steps(1) infinite;
+      overflow:hidden;
+    }
+    #hero-scanline::before,#hero-scanline::after{
+      content:'';
+      position:absolute;left:-4%;width:108%;height:3px;
+      opacity:0;
+    }
+    #hero-scanline::before{
+      background:rgba(255,0,0,.9);
+      animation:scan-r 8s linear infinite;
+    }
+    #hero-scanline::after{
+      background:rgba(0,220,255,.85);
+      animation:scan-c 8s linear infinite;
+    }
+    @keyframes scan-r{
+      0%,34%,72%,100%{opacity:0;top:20%;}
+      35%{opacity:1;top:18%;}   36%{opacity:0;top:52%;}
+      37%{opacity:1;top:49%;}   38%{opacity:0;}
+      42%{opacity:1;top:26%;}   43%{opacity:0;top:71%;}
+      44%{opacity:1;top:67%;}   45%{opacity:0;}
+      50%{opacity:.9;top:84%;}  51%{opacity:0;top:38%;}
+      52%{opacity:.75;top:35%;} 53%{opacity:0;}
+      57%{opacity:.65;top:59%;} 58%{opacity:0;}
+      62%{opacity:.45;top:74%;} 63%{opacity:0;}
+    }
+    @keyframes scan-c{
+      0%,34%,72%,100%{opacity:0;top:62%;}
+      35%{opacity:1;top:59%;}   36%{opacity:0;top:30%;}
+      37%{opacity:1;top:27%;}   38%{opacity:0;}
+      42%{opacity:1;top:77%;}   43%{opacity:0;top:44%;}
+      44%{opacity:.85;top:41%;} 45%{opacity:0;}
+      50%{opacity:.8;top:90%;}  51%{opacity:0;top:22%;}
+      52%{opacity:.65;top:20%;} 53%{opacity:0;}
+      57%{opacity:.55;top:46%;} 58%{opacity:0;}
+      62%{opacity:.35;top:66%;} 63%{opacity:0;}
     }
 
     /* glitch: csak a #hero-title mozog, a hero div NEM */
@@ -945,59 +1040,7 @@ document.addEventListener('click',e=>{
   if(!e.target.closest('#topbar-menu')&&!e.target.closest('#ham-btn'))closeMenu();
 });
 
-// ── TIKTOK GLITCH – JS extra réteg (15ms brutalitás) ───────
-(function(){
-  const el=document.getElementById('hero-title');
-  if(!el) return;
-  const CLIPS=[
-    'polygon(0 0,100% 0,100% 12%,0 12%)',
-    'polygon(0 18%,100% 18%,100% 33%,0 33%)',
-    'polygon(0 40%,100% 40%,100% 58%,0 58%)',
-    'polygon(0 62%,100% 62%,100% 78%,0 78%)',
-    'polygon(0 82%,100% 82%,100% 100%,0 100%)',
-    'polygon(0 5%,100% 5%,100% 22%,0 22%)',
-    'polygon(0 50%,100% 50%,100% 70%,0 70%)',
-  ];
-  let lastGlitch=0;
-  let glitchInterval=null;
-
-  function randInt(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
-
-  function fireGlitch(){
-    // burst: 4-8 fázis, egyenként 15ms – CSAK a cím transform-ja
-    const phases=randInt(4,8);
-    let i=0;
-    function step(){
-      if(i>=phases){
-        el.style.transform='';
-        el.style.filter='';
-        clearInterval(glitchInterval);
-        glitchInterval=null;
-        return;
-      }
-      const tx=randInt(-6,6), ty=randInt(-1,1);
-      const skew=(Math.random()>.6?(Math.random()-.5)*2:0);
-      const bright=Math.random()>.7?(Math.random()*.6+.7):1;
-      // transform csak a #hero-title elemen, nem a hero div-en!
-      el.style.transform=`translate(${tx}px,${ty}px) skewX(${skew}deg)`;
-      el.style.filter=`brightness(${bright}) saturate(${randInt(80,180)}%)`;
-      i++;
-    }
-    step();
-    glitchInterval=setInterval(step,15);
-  }
-
-  function scheduleNext(){
-    // random 800–3500ms között következő glitch
-    const delay=randInt(800,3500);
-    setTimeout(()=>{
-      fireGlitch();
-      scheduleNext();
-    },delay);
-  }
-  // első glitch gyorsan jön be
-  setTimeout(()=>{ fireGlitch(); scheduleNext(); },600);
-})();
+// ── TIKTOK GLITCH – CSS animáció kezeli, JS nem szükséges ──
 
 const YEAR = 2026;
 function isLeap(y){return(y%4===0&&y%100!==0)||(y%400===0)}
