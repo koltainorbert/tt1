@@ -1035,15 +1035,6 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Escape') document.querySelectorAll('.modal-overlay.open').forEach(el=>el.classList.remove('open'));
 });
 
-// ── HAMBURGER ──────────────────────────────────────────────
-function closeMenu(){document.getElementById('topbar-menu').classList.remove('open');}
-document.getElementById('ham-btn').addEventListener('click',()=>{
-  document.getElementById('topbar-menu').classList.toggle('open');
-});
-document.addEventListener('click',e=>{
-  if(!e.target.closest('#topbar-menu')&&!e.target.closest('#ham-btn'))closeMenu();
-});
-
 // ── TIKTOK GLITCH – CSS animáció kezeli, JS nem szükséges ──
 
 const YEAR = 2026;
