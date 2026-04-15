@@ -380,15 +380,15 @@
       pointer-events:none;
     }
     #intro-logo{
-      position:relative;z-index:5;
-      max-width:min(700px,90vw);
-      width:100%;
-      animation:logoDrop .9s cubic-bezier(.16,1,.3,1) .2s both;
-      filter:drop-shadow(0 0 40px rgba(255,100,0,.6)) drop-shadow(0 0 80px rgba(255,40,0,.3));
+      position:absolute;inset:0;z-index:5;
+      width:100%;height:100%;
+      object-fit:cover;
+      object-position:center;
+      animation:logoDrop 1.1s cubic-bezier(.16,1,.3,1) .1s both;
     }
     @keyframes logoDrop{
-      0%{opacity:0;transform:scale(.7) translateY(-40px);}
-      100%{opacity:1;transform:scale(1) translateY(0);}
+      0%{opacity:0;transform:scale(1.08);}
+      100%{opacity:1;transform:scale(1);}
     }
     #intro-tagline{
       position:relative;z-index:5;
@@ -453,7 +453,6 @@
   <div id="intro-bg"></div>
   <canvas id="intro-canvas" style="position:absolute;inset:0;z-index:4;pointer-events:none;"></canvas>
   <img id="intro-logo" src="671303117_10236971218234012_2276220733352520771_n.jpg" alt="VADKÁR VADÁSZ 2026">
-  <div id="intro-tagline">&#127806; Vadászatra kész &mdash; minden nap &mdash; minden vad</div>
   <div id="intro-skip">Kattints a belépéshez — vagy várj</div>
   <div id="intro-timer"><div id="intro-timer-bar"></div></div>
 </div>
