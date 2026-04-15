@@ -1142,7 +1142,74 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Escape') document.querySelectorAll('.modal-overlay.open').forEach(el=>el.classList.remove('open'));
 });
 
-// ── TIKTOK GLITCH – CSS animáció kezeli, JS nem szükséges ──
+// ── COUNTDOWN HELPERS ────────────────────────────────────────
+function isInSeason(seasons, m, d){
+  const t=doy(m,d);
+  for(const [ms,ds,me,de] of seasons){
+    if(ms<=me){
+      if(t>=doy(ms,ds)&&t<=doy(me,de))return true;
+    } else {
+      if(t>=doy(ms,ds)||t<=doy(me,de))return true;
+    }
+  }
+  return false;
+}
+
+function nextSeasonChange(seasons, m, d){
+  const cur=isInSeason(seasons,m,d);
+  let nm=m, nd=d;
+  for(let i=1;i<=400;i++){
+    nd++; if(nd>MD[nm-1]){nd=1;nm++;} if(nm>12)nm=1;
+    if(isInSeason(seasons,nm,nd)!==cur) return {targetM:nm,targetD:nd};
+  }
+  return null;
+}
+
+function msTillBPDate(targetM, targetD){
+  const bp=nowBP();
+  const msToMidnight=((23-bp.hour)*3600+(59-bp.minute)*60+(60-bp.second))*1000;
+  let nm=bp.month, nd=bp.day, days=0;
+  while(!(nm===targetM&&nd===targetD)){
+    nd++; if(nd>MD[nm-1]){nd=1;nm++;} if(nm>12)nm=1;
+    days++; if(days>400)break;
+  }
+  return msToMidnight + days*86400000;
+}
+
+function fmtMs(ms){
+  if(ms<=0)return '0s';
+  const s=Math.floor(ms/1000);
+  const d=Math.floor(s/86400);
+  const h=Math.floor((s%86400)/3600);
+  const m=Math.floor((s%3600)/60);
+  const sec=s%60;
+  if(d>0) return d+'n '+h+'ó '+m+'p';
+  if(h>0) return h+'ó '+m+'p '+sec+'s';
+  return m+'p '+sec+'s';
+}
+
+// All countdown elements: [{el, seasons}]
+const _acdList=[];
+
+function updateAllCountdowns(){
+  const bp=nowBP();
+  for(const {el,seasons} of _acdList){
+    const on=isInSeason(seasons,bp.month,bp.day);
+    const next=nextSeasonChange(seasons,bp.month,bp.day);
+    const dot=el.querySelector('.acd-dot');
+    const txt=el.querySelector('.acd-txt');
+    const lbl=el.querySelector('.acd-lbl');
+    el.className='acd '+(on?'on':'off');
+    if(next){
+      const ms=msTillBPDate(next.targetM,next.targetD);
+      txt.textContent=fmtMs(ms);
+      lbl.textContent=on?' › tilalom'  :' › nyitás';
+    } else {
+      txt.textContent='–'; lbl.textContent='';
+    }
+  }
+}
+setInterval(updateAllCountdowns,1000);
 
 const YEAR = 2026;
 function isLeap(y){return(y%4===0&&y%100!==0)||(y%400===0)}
@@ -1418,6 +1485,14 @@ for(const g of groups){
     const row=document.createElement('div');row.className='animal-row';
     const nd=document.createElement('div');nd.className='animal-name';
     nd.innerHTML=a.name+(a.sub?`<span class="sub">${a.sub}</span>`:'');
+
+    // countdown badge
+    const acd=document.createElement('div');
+    acd.className='acd';
+    acd.innerHTML='<div class="acd-dot"></div><span class="acd-txt"></span><span class="acd-lbl"></span>';
+    nd.appendChild(acd);
+    _acdList.push({el:acd, seasons:a.seasons});
+
     row.appendChild(nd);
 
     const ba=makeBarArea(38);
@@ -1440,6 +1515,8 @@ for(const g of groups){
     gl.classList.toggle('collapsed',h);
   });
 }
+// initial countdown render
+updateAllCountdowns();
 
 // ── HOLDNAPTÁR ────────────────────────────────────────────
 (function(){
