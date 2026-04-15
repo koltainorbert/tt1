@@ -123,18 +123,8 @@
       animation:glitch-scan 2.4s steps(1) infinite;
     }
 
-    /* whole-hero shake on glitch */
-    @keyframes glitch-shake{
-      0%,88%  {transform:none}
-      90%     {transform:translate(-3px,1px) skewX(-1deg)}
-      90.015% {transform:translate(4px,-1px) skewX(.8deg)}
-      90.03%  {transform:translate(-2px,2px)}
-      90.05%  {transform:none}
-      93%     {transform:translate(3px,0) skewX(.5deg)}
-      93.02%  {transform:none}
-      100%    {transform:none}
-    }
-    #hero{ animation:glitch-shake 2.4s steps(1) infinite; }
+    /* glitch: csak a scanline felvillan, hero NEM mozog */
+    #hero{ /* nincs glitch-shake animáció */ }
 
     #hero-sub{
       font-size:clamp(.7rem,1.8vw,.95rem);
@@ -974,7 +964,7 @@ document.addEventListener('click',e=>{
   function randInt(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
 
   function fireGlitch(){
-    // burst: 4-8 fázis, egyenként 15ms
+    // burst: 4-8 fázis, egyenként 15ms – CSAK a cím transform-ja
     const phases=randInt(4,8);
     let i=0;
     function step(){
@@ -983,19 +973,14 @@ document.addEventListener('click',e=>{
         el.style.filter='';
         clearInterval(glitchInterval);
         glitchInterval=null;
-        // reset CSS vars
-        el.style.setProperty('--gx','0px');
-        el.style.setProperty('--gy','0px');
         return;
       }
-      const tx=randInt(-8,8), ty=randInt(-2,2);
-      const skew=( Math.random()>.6?(Math.random()-.5)*3:0 );
-      const bright=Math.random()>.7?(Math.random()*.8+.6):1;
+      const tx=randInt(-6,6), ty=randInt(-1,1);
+      const skew=(Math.random()>.6?(Math.random()-.5)*2:0);
+      const bright=Math.random()>.7?(Math.random()*.6+.7):1;
+      // transform csak a #hero-title elemen, nem a hero div-en!
       el.style.transform=`translate(${tx}px,${ty}px) skewX(${skew}deg)`;
-      el.style.filter=`brightness(${bright}) saturate(${randInt(80,200)}%)`;
-      // clip jitter via CSS custom props (pseudo uses them)
-      el.style.setProperty('--clip1',CLIPS[randInt(0,CLIPS.length-1)]);
-      el.style.setProperty('--clip2',CLIPS[randInt(0,CLIPS.length-1)]);
+      el.style.filter=`brightness(${bright}) saturate(${randInt(80,180)}%)`;
       i++;
     }
     step();
