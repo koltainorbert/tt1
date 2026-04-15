@@ -350,56 +350,50 @@
     /* ── INTRO ── */
     #intro{
       position:fixed;inset:0;z-index:9999;
-      background:#000;
-      display:flex;flex-direction:column;
-      align-items:center;justify-content:center;
+      background-color:#000;
+      background-image:url('671303117_10236971218234012_2276220733352520771_n.jpg');
+      background-size:cover;
+      background-position:center center;
+      background-repeat:no-repeat;
       overflow:hidden;
       cursor:pointer;
+      animation:introImgIn 1.2s ease both;
     }
-    #intro.fade-out{
-      animation:introFadeOut .9s ease-in forwards;
+    @keyframes introImgIn{
+      from{opacity:0;transform:scale(1.05);}
+      to{opacity:1;transform:scale(1);}
     }
-    @keyframes introFadeOut{
-      0%{opacity:1;transform:scale(1);}
-      60%{opacity:.6;transform:scale(1.04);}
-      100%{opacity:0;transform:scale(1.08);pointer-events:none;}
-    }
-    #intro-bg{
-      position:absolute;inset:0;
-      background:#000;
-    }
-    /* scanlines */
+    /* CRT scanlines */
     #intro::before{
       content:'';
       position:absolute;inset:0;z-index:2;
       background:repeating-linear-gradient(
         0deg,
-        transparent,transparent 2px,
-        rgba(0,0,0,.12) 2px,rgba(0,0,0,.12) 4px
+        transparent,transparent 3px,
+        rgba(0,0,0,.08) 3px,rgba(0,0,0,.08) 4px
       );
       pointer-events:none;
     }
-    #intro-logo{
-      position:absolute;
-      top:0;left:0;
-      width:100vw;height:100vh;
-      width:100dvw;height:100dvh;
-      object-fit:cover;
-      object-position:center center;
-      z-index:5;
-      display:block;
-      animation:logoDrop 1s ease .1s both;
+    /* crack lines canvas */
+    #crack-canvas{
+      position:absolute;inset:0;z-index:10;
+      pointer-events:none;
+      width:100%;height:100%;
     }
-    @keyframes logoDrop{
-      from{opacity:0;transform:scale(1.06);}
-      to{opacity:1;transform:scale(1);}
+    /* muzzle flash */
+    #gun-flash{
+      position:absolute;inset:0;z-index:15;
+      background:radial-gradient(ellipse at 50% 42%, #fff 0%, #ffe066 30%, transparent 70%);
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .06s;
     }
-    /* timer bar — bottom of screen, always visible */
+    /* timer bar */
     #intro-timer{
       position:absolute;
       bottom:0;left:0;right:0;
-      height:5px;
-      background:rgba(0,0,0,.4);
+      height:4px;
+      background:rgba(0,0,0,.5);
       z-index:20;
     }
     #intro-timer-bar{
@@ -407,217 +401,140 @@
       width:100%;
       background:linear-gradient(90deg,#ff2200,#ff8800,#ffdd00);
       transform-origin:left;
-      box-shadow:0 0 12px #ff4400, 0 0 24px #ff220066;
-      animation:timerBar 5s linear .5s forwards;
+      box-shadow:0 0 10px #ff4400,0 0 20px #ff220066;
+      animation:timerBar 4.5s linear .8s forwards;
     }
     @keyframes timerBar{
-      from{transform:scaleX(1);}
-      to{transform:scaleX(0);}
+      from{transform:scaleX(1);} to{transform:scaleX(0);}
     }
-    /* tap hint */
-    #intro-hint{
-      position:absolute;
-      bottom:20px;left:50%;transform:translateX(-50%);
-      z-index:20;
-      font-family:'Segoe UI',Arial,sans-serif;
-      font-size:clamp(.65rem,2vw,.8rem);
-      letter-spacing:.2em;
-      text-transform:uppercase;
-      color:rgba(255,255,255,.45);
-      animation:hintBlink 1.2s ease 2s both;
-      white-space:nowrap;
-    }
-    @keyframes hintBlink{
-      0%{opacity:0;} 60%{opacity:1;} 80%{opacity:.3;} 100%{opacity:.7;}
-    }
-    /* bullet hole SVG overlay */
-    #bullet-overlay{
-      position:absolute;inset:0;z-index:30;
+    /* bullet trajectory line (before impact) */
+    #bullet-trail{
+      position:absolute;z-index:8;
+      top:0;left:0;
       pointer-events:none;
-      display:none;
-    }
-    /* crack lines canvas */
-    #crack-canvas{
-      position:absolute;inset:0;z-index:28;
-      pointer-events:none;
-    }
-    /* flash */
-    #gun-flash{
-      position:absolute;inset:0;z-index:35;
-      background:#fff;
       opacity:0;
-      pointer-events:none;
-    }
-    /* FIRE PARTICLES */
-    .spark{
-      position:absolute;
-      border-radius:50%;
-      pointer-events:none;
-      z-index:3;
     }
   </style>
 </head>
 <body>
 
-<!-- ── INTRO ───────────────────────────────────────────── -->
+<!-- ── INTRO ─────────────────────── -->
 <div id="intro">
-  <div id="intro-bg"></div>
-  <canvas id="intro-canvas" style="position:absolute;inset:0;z-index:4;pointer-events:none;"></canvas>
-  <img id="intro-logo" src="671303117_10236971218234012_2276220733352520771_n.jpg" alt="VADKÁR VADÁSZ 2026">
   <canvas id="crack-canvas"></canvas>
   <div id="gun-flash"></div>
   <div id="intro-timer"><div id="intro-timer-bar"></div></div>
-  <div id="intro-hint">Koppints a belépéshez</div>
 </div>
 
 <script>
-// ── INTRO LOGIC
+// ── INTRO ───────────────────────────────────────────────
 (function(){
-  const intro=document.getElementById('intro');
-  const fireCanvas=document.getElementById('intro-canvas');
-  const crackCanvas=document.getElementById('crack-canvas');
-  const flash=document.getElementById('gun-flash');
-  const fCtx=fireCanvas.getContext('2d');
-  const cCtx=crackCanvas.getContext('2d');
-  let raf,dismissed=false;
+  const intro  = document.getElementById('intro');
+  const cc     = document.getElementById('crack-canvas');
+  const flash  = document.getElementById('gun-flash');
+  const ctx    = cc.getContext('2d');
+  let done     = false;
 
   function resize(){
-    fireCanvas.width=crackCanvas.width=window.innerWidth;
-    fireCanvas.height=crackCanvas.height=window.innerHeight;
+    cc.width  = window.innerWidth;
+    cc.height = window.innerHeight;
   }
   resize();
-  window.addEventListener('resize',resize);
+  window.addEventListener('resize', resize);
 
-  // ── Fire sparks
-  const particles=[];
-  function mkParticle(){
-    particles.push({
-      x:Math.random()*fireCanvas.width,
-      y:fireCanvas.height+10,
-      size:Math.random()*3.5+.8,
-      speed:Math.random()*1.8+.8,
-      life:Math.random()*70+50,
-      maxLife:0,
-      hue:Math.random()*35+8,
-      dx:(Math.random()-.5)*1
-    });
-    particles[particles.length-1].maxLife=particles[particles.length-1].life;
-  }
-  function drawSparks(){
-    fCtx.clearRect(0,0,fireCanvas.width,fireCanvas.height);
-    for(let i=particles.length-1;i>=0;i--){
-      const p=particles[i];
-      p.y-=p.speed; p.x+=p.dx; p.life--;
-      if(p.life<=0){particles.splice(i,1);continue;}
-      const a=(p.life/p.maxLife)*.7;
-      const r=p.size*(p.life/p.maxLife);
-      const g=fCtx.createRadialGradient(p.x,p.y,0,p.x,p.y,r*3);
-      g.addColorStop(0,`hsla(${p.hue},100%,92%,${a})`);
-      g.addColorStop(.5,`hsla(${p.hue},100%,58%,${a*.5})`);
-      g.addColorStop(1,`hsla(${p.hue},100%,38%,0)`);
-      fCtx.beginPath();
-      fCtx.arc(p.x,p.y,r*3,0,Math.PI*2);
-      fCtx.fillStyle=g;
-      fCtx.fill();
-    }
-  }
-  let lastSpawn=0;
-  function loop(ts){
-    if(dismissed) return;
-    if(ts-lastSpawn>22){mkParticle();mkParticle();lastSpawn=ts;}
-    drawSparks();
-    raf=requestAnimationFrame(loop);
-  }
-  requestAnimationFrame(loop);
+  // ── draw cracks + bullet hole at (cx,cy)
+  function drawCracks(cx, cy){
+    const w = cc.width, h = cc.height;
+    ctx.clearRect(0,0,w,h);
 
-  // ── Bullet shatter effect
-  function shootEffect(cx,cy){
-    // White flash
-    flash.style.transition='none';
-    flash.style.opacity='.85';
-    setTimeout(()=>{
-      flash.style.transition='opacity .35s ease';
-      flash.style.opacity='0';
-    },60);
-
-    // Crack lines from hit point
-    const w=crackCanvas.width, h=crackCanvas.height;
-    cCtx.clearRect(0,0,w,h);
-    const numCracks=14+Math.floor(Math.random()*8);
-    for(let i=0;i<numCracks;i++){
-      const angle=(Math.PI*2/numCracks)*i + (Math.random()-.5)*.4;
-      const len=(Math.random()*.45+.25)*Math.min(w,h);
-      const segs=Math.floor(Math.random()*4)+3;
-      cCtx.beginPath();
-      cCtx.moveTo(cx,cy);
-      let px=cx,py=cy;
+    const n = 18 + Math.floor(Math.random()*8);
+    for(let i=0;i<n;i++){
+      const base  = (Math.PI*2/n)*i;
+      const angle = base + (Math.random()-.5)*.5;
+      const len   = (Math.random()*.5+.3)*Math.min(w,h);
+      const segs  = 4 + Math.floor(Math.random()*4);
+      ctx.beginPath();
+      ctx.moveTo(cx,cy);
+      let px=cx, py=cy;
       for(let s=0;s<segs;s++){
-        const segLen=len/segs*(Math.random()*.5+.7);
-        const jitter=(Math.random()-.5)*.35;
-        px+=Math.cos(angle+jitter)*segLen;
-        py+=Math.sin(angle+jitter)*segLen;
-        cCtx.lineTo(px,py);
-        // branch
-        if(s===1&&Math.random()>.4){
-          const ba=angle+(Math.random()-.5)*1.2;
-          const bl=segLen*(Math.random()*.5+.2);
-          const bx2=px+Math.cos(ba)*bl, by2=py+Math.sin(ba)*bl;
-          cCtx.moveTo(px,py);
-          cCtx.lineTo(bx2,by2);
-          cCtx.moveTo(px,py);
+        const sl  = len/segs*(Math.random()*.6+.7);
+        const j   = (Math.random()-.5)*.4;
+        px += Math.cos(angle+j)*sl;
+        py += Math.sin(angle+j)*sl;
+        ctx.lineTo(px,py);
+        // sub-branch
+        if(s===1 && Math.random()>.45){
+          const ba=angle+(Math.random()-.5)*1.3;
+          const bl=sl*(Math.random()*.5+.2);
+          ctx.moveTo(px,py);
+          ctx.lineTo(px+Math.cos(ba)*bl, py+Math.sin(ba)*bl);
+          ctx.moveTo(px,py);
         }
       }
-      const alpha=Math.random()*.6+.3;
-      cCtx.strokeStyle=`rgba(255,255,255,${alpha})`;
-      cCtx.lineWidth=Math.random()*2.5+.5;
-      cCtx.lineCap='round';
-      cCtx.stroke();
+      ctx.strokeStyle=`rgba(255,255,255,${Math.random()*.55+.35})`;
+      ctx.lineWidth=Math.random()*2.8+.4;
+      ctx.lineCap='round';
+      ctx.stroke();
     }
-    // bullet hole circle
-    const r1=Math.min(w,h)*.025;
-    const g2=cCtx.createRadialGradient(cx,cy,0,cx,cy,r1*2);
-    g2.addColorStop(0,'rgba(0,0,0,1)');
-    g2.addColorStop(.5,'rgba(20,10,0,.9)');
+
+    // bullet hole
+    const r = Math.min(w,h)*.028;
+    const g1=ctx.createRadialGradient(cx,cy,0,cx,cy,r*2.2);
+    g1.addColorStop(0,'rgba(0,0,0,1)');
+    g1.addColorStop(.6,'rgba(10,5,0,.95)');
+    g1.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.beginPath(); ctx.arc(cx,cy,r*2.2,0,Math.PI*2);
+    ctx.fillStyle=g1; ctx.fill();
+
+    // glow ring
+    const g2=ctx.createRadialGradient(cx,cy,r*.5,cx,cy,r*5);
+    g2.addColorStop(0,'rgba(255,200,60,.65)');
+    g2.addColorStop(.4,'rgba(255,80,0,.3)');
     g2.addColorStop(1,'rgba(0,0,0,0)');
-    cCtx.beginPath();
-    cCtx.arc(cx,cy,r1*2,0,Math.PI*2);
-    cCtx.fillStyle=g2;
-    cCtx.fill();
-    // glass shards glow
-    const g3=cCtx.createRadialGradient(cx,cy,r1*.3,cx,cy,r1*3.5);
-    g3.addColorStop(0,'rgba(255,220,100,.5)');
-    g3.addColorStop(1,'rgba(255,80,0,0)');
-    cCtx.beginPath();
-    cCtx.arc(cx,cy,r1*3.5,0,Math.PI*2);
-    cCtx.fillStyle=g3;
-    cCtx.fill();
+    ctx.beginPath(); ctx.arc(cx,cy,r*5,0,Math.PI*2);
+    ctx.fillStyle=g2; ctx.fill();
   }
 
-  // ── Dismiss
-  function dismiss(e){
-    if(dismissed) return;
-    dismissed=true;
-    const rect=intro.getBoundingClientRect();
-    let cx,cy;
-    if(e&&(e.clientX||e.touches)){
-      const t=e.touches?e.touches[0]:e;
-      cx=t.clientX-rect.left; cy=t.clientY-rect.top;
-    } else {
-      cx=crackCanvas.width/2; cy=crackCanvas.height*0.42;
-    }
-    cancelAnimationFrame(raf);
-    shootEffect(cx,cy);
+  // ── Dismiss + exit
+  function exit(){
+    if(done) return;
+    done=true;
+    // 1) Muzzle flash burst
+    flash.style.opacity='1';
+    setTimeout(()=>{ flash.style.transition='opacity .5s ease'; flash.style.opacity='0'; },80);
+
+    // 2) Draw cracks after short delay (bullet travels)
     setTimeout(()=>{
-      intro.style.transition='opacity .7s ease, transform .7s ease';
+      const cx=cc.width*.5, cy=cc.height*.42;
+      drawCracks(cx,cy);
+    }, 180);
+
+    // 3) Shake
+    setTimeout(()=>{
+      intro.style.transition='transform .08s';
+      intro.style.transform='translate(-6px,-4px) rotate(.4deg)';
+      setTimeout(()=>{ intro.style.transform='translate(5px,3px) rotate(-.3deg)'; },80);
+      setTimeout(()=>{ intro.style.transform='translate(-3px,2px)'; },160);
+      setTimeout(()=>{ intro.style.transform=''; },240);
+    }, 150);
+
+    // 4) Slow dramatic fade out
+    setTimeout(()=>{
+      intro.style.transition='opacity 1s ease, transform 1.2s ease';
       intro.style.opacity='0';
-      intro.style.transform='scale(1.05)';
-      setTimeout(()=>intro.remove(),720);
-    },280);
+      intro.style.transform='scale(1.06)';
+      setTimeout(()=>intro.remove(), 1100);
+    }, 900);
   }
 
-  intro.addEventListener('click',dismiss);
-  intro.addEventListener('touchend',function(e){e.preventDefault();dismiss(e);},{passive:false});
-  setTimeout(()=>dismiss(null),5600);
+  // Auto-play timeline:
+  // 0.8s  – image visible
+  // 3.2s  – BANG!
+  // ~5.3s – fully gone
+  setTimeout(exit, 3200);
+
+  // Tap/click = skip directly to shoot
+  intro.addEventListener('click', exit);
+  intro.addEventListener('touchend', function(e){ e.preventDefault(); exit(); }, {passive:false});
 })();
 </script>
 
