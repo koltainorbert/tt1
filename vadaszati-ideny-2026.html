@@ -873,11 +873,10 @@ const groups=[
 
 // ── TODAY PANEL ──────────────────────────────────────────────
 function buildTodayPanel(){
-  const now=new Date();
-  const tm=now.getMonth()+1, td=now.getDate();
+  const bp=nowBP();
+  const tm=bp.month, td=bp.day;
   const todayDoy=doy(tm,td);
   const MFH=['január','február','március','április','május','június','július','augusztus','szeptember','október','november','december'];
-  const DH=['vasárnap','hétfő','kedd','szerda','csütörtök','péntek','szombat'];
 
   const open=[], soon=[];
   const seen=new Set();
