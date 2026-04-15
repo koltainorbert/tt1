@@ -714,6 +714,19 @@
       border-radius:8px;
       padding:9px 12px 10px;
     }
+    .tp-card--new{
+      background:rgba(255,220,0,.07);
+      border-color:rgba(255,220,0,.35);
+      border-left-color:inherit !important;
+      box-shadow:0 0 16px rgba(255,200,0,.12),inset 0 0 20px rgba(255,200,0,.04);
+      animation:tp-new-pulse 2s ease-in-out infinite;
+    }
+    @keyframes tp-new-pulse{
+      0%,100%{box-shadow:0 0 16px rgba(255,200,0,.12),inset 0 0 20px rgba(255,200,0,.04);}
+      50%{box-shadow:0 0 28px rgba(255,200,0,.28),inset 0 0 30px rgba(255,200,0,.09);}
+    }
+    .tp-card--new .tp-card-name{color:#ffe066;text-shadow:0 0 10px rgba(255,220,0,.4);}
+    .b-new{background:rgba(255,220,0,.18);color:#ffe066;border:1px solid rgba(255,220,0,.35);}
     .tp-card-name{font-size:.77rem;font-weight:700;color:#fff;line-height:1.3}
     .tp-card-sub{font-size:.62rem;color:rgba(255,255,255,.32);font-style:italic;margin-top:1px}
     .tp-card-range{font-size:.66rem;color:rgba(255,255,255,.45);margin-top:5px}
@@ -725,7 +738,6 @@
     .b-ok{background:rgba(0,180,60,.15);color:#1ec854}
     .b-warn{background:rgba(255,165,0,.18);color:#f5a623}
     .b-urgent{background:rgba(255,50,50,.2);color:#ff6060}
-    .b-new{background:rgba(255,255,255,.1);color:#fff}
     .b-soon{background:rgba(255,255,255,.06);color:rgba(255,255,255,.45)}
     .tp-empty{font-size:.78rem;color:rgba(255,255,255,.28);padding:12px 0}
     .tp-cd{
@@ -1410,7 +1422,7 @@ function buildTodayPanel(){
       else if(a.daysLeft<=14){bc='b-warn';bt=`Még ${a.daysLeft} nap – Utolsó vadászati nap: ${a.closing}`;}
       else{bc='b-ok';bt=`Utolsó vadászati nap: ${a.closing} (${a.daysLeft} nap)`;}
       const card=document.createElement('div');
-      card.className='tp-card';
+      card.className='tp-card'+(a.isNew?' tp-card--new':'');
       card.style.borderLeftColor=a.color;
       card.innerHTML=`<div class="tp-card-name">${a.name}</div><div class="tp-card-sub">${a.sub}</div><div class="tp-card-range">${a.range}</div><span class="tp-badge ${bc}">${bt}</span><div class="tp-cd"></div>`;
       const cdEl=card.querySelector('.tp-cd');
@@ -1442,6 +1454,7 @@ function buildTodayPanel(){
     }
     panel.appendChild(grid2);
   }
+  updateTPCountdowns();
 }
 buildTodayPanel();
 
