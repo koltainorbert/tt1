@@ -1,1 +1,348 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Vadászati idények 2026</title>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
+    body{
+      background:rgb(6,6,6);
+      background-image:radial-gradient(circle,rgba(255,255,255,.06) 1px,transparent 1px);
+      background-size:24px 24px;
+      color:#fff;
+      font-family:'Segoe UI',Arial,sans-serif;
+      min-height:100vh;
+      padding:36px 20px 60px;
+    }
+
+    h1{text-align:center;font-size:1.9rem;letter-spacing:.07em;margin-bottom:6px}
+    h1 span{color:#ff0000}
+    .subtitle{text-align:center;font-size:.8rem;color:rgba(255,255,255,.4);margin-bottom:28px;letter-spacing:.05em}
+
+    /* ── LEGEND ── */
+    .legend{
+      display:flex;flex-wrap:wrap;justify-content:center;
+      gap:8px 18px;margin-bottom:24px;
+    }
+    .leg{display:flex;align-items:center;gap:6px;font-size:.75rem;color:rgba(255,255,255,.7)}
+    .leg-dot{width:16px;height:10px;border-radius:3px;flex-shrink:0}
+
+    /* ── CHART ── */
+    .chart{
+      max-width:1200px;margin:0 auto;
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:12px;overflow:hidden;
+    }
+
+    /* MONTH HEADER */
+    .month-header{
+      display:flex;
+      background:rgba(255,255,255,.03);
+      border-bottom:1px solid rgba(255,255,255,.1);
+    }
+    .mh-name{
+      width:220px;min-width:220px;flex-shrink:0;
+      padding:8px 14px;
+      font-size:.68rem;color:rgba(255,255,255,.4);
+      letter-spacing:.08em;text-transform:uppercase;
+      border-right:1px solid rgba(255,255,255,.08);
+    }
+    .mh-months{flex:1;display:flex;position:relative;}
+    .mh-month{
+      flex:1;text-align:center;
+      font-size:.7rem;font-weight:700;
+      color:rgba(255,255,255,.55);
+      letter-spacing:.06em;padding:8px 0;
+      border-left:1px solid rgba(255,255,255,.08);
+    }
+    .mh-month.current{color:#ff0000}
+
+    /* GROUP HEADER */
+    .group-header{
+      display:flex;align-items:center;
+      background:rgba(255,0,0,.08);
+      border-top:1px solid rgba(255,0,0,.18);
+      border-bottom:1px solid rgba(255,0,0,.12);
+      cursor:pointer;user-select:none;
+      transition:background .15s;
+    }
+    .group-header:hover{background:rgba(255,0,0,.15)}
+    .group-label{
+      width:220px;min-width:220px;flex-shrink:0;
+      padding:9px 14px;
+      font-size:.72rem;font-weight:700;
+      color:#ff0000;letter-spacing:.1em;text-transform:uppercase;
+      border-right:1px solid rgba(255,0,0,.18);
+      display:flex;align-items:center;gap:7px;
+    }
+    .arrow{font-size:.6rem;transition:transform .2s;display:inline-block}
+    .group-label.collapsed .arrow{transform:rotate(-90deg)}
+    .group-bar-area{flex:1;position:relative;height:34px}
+
+    /* ANIMAL ROW */
+    .animal-row{
+      display:flex;align-items:center;
+      border-bottom:1px solid rgba(255,255,255,.04);
+      transition:background .12s;min-height:38px;
+    }
+    .animal-row:hover{background:rgba(255,255,255,.04)}
+    .animal-name{
+      width:220px;min-width:220px;flex-shrink:0;
+      padding:6px 14px;
+      font-size:.78rem;font-weight:600;color:#fff;
+      border-right:1px solid rgba(255,255,255,.06);
+      line-height:1.3;
+    }
+    .animal-name .sub{
+      display:block;font-size:.64rem;font-weight:400;
+      color:rgba(255,255,255,.35);margin-top:1px;font-style:italic;
+    }
+    .bar-area{flex:1;position:relative;height:38px;}
+
+    /* Month gridlines and today line */
+    .bar-area,.group-bar-area{
+      --mp: 8.3333%;
+    }
+    .bar-area::before,.group-bar-area::before{
+      content:'';position:absolute;inset:0;pointer-events:none;
+      background:repeating-linear-gradient(
+        90deg,
+        transparent 0,transparent calc(var(--mp) - 1px),
+        rgba(255,255,255,.05) calc(var(--mp) - 1px),
+        rgba(255,255,255,.05) var(--mp)
+      );
+    }
+
+    /* TODAY line */
+    .today-line{
+      position:absolute;top:0;bottom:0;width:2px;
+      background:rgba(255,0,0,.9);z-index:10;pointer-events:none;
+    }
+    .today-label{
+      position:absolute;top:2px;
+      font-size:.58rem;color:#ff0000;font-weight:700;
+      white-space:nowrap;transform:translateX(-50%);
+    }
+
+    /* SEASON BAR */
+    .sbar{
+      position:absolute;top:50%;transform:translateY(-50%);
+      height:18px;border-radius:4px;
+      opacity:.85;cursor:default;
+      transition:opacity .15s,height .15s;
+    }
+    .sbar:hover{opacity:1;height:24px}
+
+    /* Tooltip */
+    .sbar::after{
+      content:attr(data-tip);
+      position:absolute;bottom:calc(100% + 6px);
+      left:50%;transform:translateX(-50%);
+      background:rgba(0,0,0,.95);color:#fff;
+      font-size:.68rem;padding:4px 10px;border-radius:5px;
+      white-space:nowrap;pointer-events:none;
+      opacity:0;transition:opacity .15s;z-index:100;
+      border:1px solid rgba(255,255,255,.12);
+    }
+    .sbar:hover::after{opacity:1}
+
+    .group-body.hidden{display:none}
+
+    footer{
+      text-align:center;margin-top:28px;
+      font-size:.7rem;color:rgba(255,255,255,.22);letter-spacing:.04em;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Vadászati idények <span>2026</span></h1>
+<p class="subtitle">Magyar vadászati naptár &nbsp;·&nbsp; január 1. – december 31. &nbsp;·&nbsp; <span style="color:#ff0000;font-weight:700">|</span> = ápr. 15. (ma) &nbsp;·&nbsp; Csoportokra kattintva össze/kibontható</p>
+
+<div class="legend">
+  <div class="leg"><div class="leg-dot" style="background:#1ec854"></div>Gímszarvas</div>
+  <div class="leg"><div class="leg-dot" style="background:#f5a623"></div>Dámszarvas</div>
+  <div class="leg"><div class="leg-dot" style="background:#3d9ff5"></div>Őz</div>
+  <div class="leg"><div class="leg-dot" style="background:#cc44cc"></div>Muflon</div>
+  <div class="leg"><div class="leg-dot" style="background:#f55050"></div>Vaddisznó</div>
+  <div class="leg"><div class="leg-dot" style="background:#f5d020"></div>Apróvad</div>
+  <div class="leg"><div class="leg-dot" style="background:#20d4d4"></div>Szárnyasvad</div>
+  <div class="leg"><div class="leg-dot" style="background:#ff8c00"></div>Vízi szárnyasvad</div>
+  <div class="leg"><div class="leg-dot" style="background:#aaa"></div>Ragadozók</div>
+</div>
+
+<div class="chart" id="chart"></div>
+
+<footer>
+  Forrás: 79/2004. (V.4.) FVM rendelet és módosításai &nbsp;|&nbsp; Nem helyettesíti a hatályos jogszabályokat.
+</footer>
+
+<script>
+const YEAR = 2026;
+function isLeap(y){return(y%4===0&&y%100!==0)||(y%400===0)}
+const MD=[31,isLeap(YEAR)?29:28,31,30,31,30,31,31,30,31,30,31];
+const MN=["Jan","Feb","Már","Ápr","Máj","Jún","Júl","Aug","Szep","Okt","Nov","Dec"];
+const MF=["Január","Február","Március","Április","Május","Június","Július","Augusztus","Szeptember","Október","November","December"];
+const TOTAL=MD.reduce((a,b)=>a+b,0);
+const TODAY={m:4,d:15};
+
+function doy(month,day){let i=0;for(let m=1;m<month;m++)i+=MD[m-1];return i+day-1;}
+function pct(d){return(d/TOTAL*100).toFixed(4)+'%'}
+const TODAY_PCT=(doy(TODAY.m,TODAY.d)/TOTAL*100).toFixed(4)+'%';
+
+function segs(seasons){
+  const out=[];
+  for(const[ms,ds,me,de]of seasons){
+    if(ms<=me){
+      const s=doy(ms,ds),e=doy(me,de);
+      out.push({sp:s/TOTAL*100,wp:(e-s+1)/TOTAL*100,lbl:`${MF[ms-1]} ${ds}. – ${MF[me-1]} ${de}.`});
+    } else {
+      const e1=doy(me,de);
+      if(e1>=0) out.push({sp:0,wp:(e1+1)/TOTAL*100,lbl:`Jan 1. – ${MF[me-1]} ${de}.`});
+      const s2=doy(ms,ds);
+      out.push({sp:s2/TOTAL*100,wp:(TOTAL-s2)/TOTAL*100,lbl:`${MF[ms-1]} ${ds}. – Dec 31.`});
+    }
+  }
+  return out;
+}
+
+const groups=[
+  {label:"SZARVASFÉLÉK – GÍM",color:"#1ec854",animals:[
+    {name:"Gímszarvas – bika",sub:"Cervus elaphus ♂",seasons:[[9,1,12,31]]},
+    {name:"Gímszarvas – tehén / ünő",sub:"Cervus elaphus ♀",seasons:[[10,1,1,31]]},
+    {name:"Gímszarvas – borjú",sub:"Cervus elaphus juv.",seasons:[[8,1,1,31]]},
+  ]},
+  {label:"SZARVASFÉLÉK – DÁM",color:"#f5a623",animals:[
+    {name:"Dámszarvas – bak",sub:"Dama dama ♂",seasons:[[9,1,12,31]]},
+    {name:"Dámszarvas – suta",sub:"Dama dama ♀",seasons:[[10,1,1,31]]},
+    {name:"Dámszarvas – gida",sub:"Dama dama juv.",seasons:[[8,1,1,31]]},
+  ]},
+  {label:"ŐZ",color:"#3d9ff5",animals:[
+    {name:"Őzbak",sub:"Capreolus capreolus ♂",seasons:[[4,15,9,30]]},
+    {name:"Őzsuta",sub:"Capreolus capreolus ♀",seasons:[[10,1,1,31]]},
+    {name:"Őzgida",sub:"Capreolus capreolus juv.",seasons:[[8,1,1,31]]},
+  ]},
+  {label:"MUFLON",color:"#cc44cc",animals:[
+    {name:"Muflon – kos",sub:"Ovis musimon ♂",seasons:[[8,1,1,31]]},
+    {name:"Muflon – juh",sub:"Ovis musimon ♀",seasons:[[10,1,1,31]]},
+    {name:"Muflon – bárány",sub:"Ovis musimon juv.",seasons:[[8,1,1,31]]},
+  ]},
+  {label:"VADDISZNÓ",color:"#f55050",animals:[
+    {name:"Vaddisznó – kan",sub:"Sus scrofa ♂",seasons:[[1,1,12,31]]},
+    {name:"Vaddisznó – koca",sub:"Sus scrofa ♀  (nem szoptatós)",seasons:[[7,1,12,31]]},
+    {name:"Vaddisznó – malac",sub:"Sus scrofa juv.",seasons:[[7,1,12,31]]},
+  ]},
+  {label:"APRÓVAD – SZÁRAZFÖLDI",color:"#f5d020",animals:[
+    {name:"Mezei nyúl",sub:"Lepus europaeus",seasons:[[10,1,12,31]]},
+    {name:"Fácán – kakas",sub:"Phasianus colchicus ♂",seasons:[[10,1,1,31]]},
+    {name:"Fácán – tyúk",sub:"Phasianus colchicus ♀",seasons:[[10,1,11,30]]},
+    {name:"Fogoly",sub:"Perdix perdix",seasons:[[10,1,11,30]]},
+    {name:"Balkáni gerle",sub:"Streptopelia decaocto",seasons:[[6,1,2,28]]},
+    {name:"Vadgalamb",sub:"Columba palumbus",seasons:[[8,15,1,31]]},
+    {name:"Erdei szalonka",sub:"Scolopax rusticola",seasons:[[3,1,4,30],[10,1,11,30]]},
+  ]},
+  {label:"SZÁRNYASVAD",color:"#20d4d4",animals:[
+    {name:"Fürj",sub:"Coturnix coturnix",seasons:[[8,15,10,31]]},
+    {name:"Seregély",sub:"Sturnus vulgaris",seasons:[[8,1,1,31]]},
+  ]},
+  {label:"VÍZI SZÁRNYASVAD",color:"#ff8c00",animals:[
+    {name:"Tőkés réce – gácsér",sub:"Anas platyrhynchos ♂",seasons:[[8,15,1,31]]},
+    {name:"Tőkés réce – tojó",sub:"Anas platyrhynchos ♀",seasons:[[8,15,1,31]]},
+    {name:"Böjti réce",sub:"Anas querquedula",seasons:[[8,15,11,30]]},
+    {name:"Nyílfarkú réce",sub:"Anas acuta",seasons:[[8,15,1,31]]},
+    {name:"Nagy lilik",sub:"Anser albifrons",seasons:[[10,1,1,31]]},
+    {name:"Vetési lúd",sub:"Anser fabalis",seasons:[[10,1,1,31]]},
+    {name:"Nyári lúd",sub:"Anser anser",seasons:[[8,15,1,31]]},
+  ]},
+  {label:"RAGADOZÓK",color:"#b0b0b0",animals:[
+    {name:"Vörösróka",sub:"Vulpes vulpes",seasons:[[1,1,12,31]]},
+    {name:"Aranysakál",sub:"Canis aureus",seasons:[[1,1,12,31]]},
+    {name:"Borz",sub:"Meles meles",seasons:[[9,1,11,30]]},
+    {name:"Nyest / Nyuszt",sub:"Martes foina / M. martes",seasons:[[10,1,2,28]]},
+    {name:"Dolmányos varjú",sub:"Corvus cornix",seasons:[[1,1,12,31]]},
+    {name:"Szarka",sub:"Pica pica",seasons:[[1,1,12,31]]},
+  ]},
+];
+
+// ── Build DOM ─────────────────────────────────────────────
+const chart=document.getElementById('chart');
+
+function makeTodayLine(){
+  const t=document.createElement('div');
+  t.className='today-line';
+  t.style.left=TODAY_PCT;
+  return t;
+}
+
+function makeBarArea(h){
+  const ba=document.createElement('div');
+  ba.className='bar-area';
+  ba.style.height=h+'px';
+  ba.appendChild(makeTodayLine());
+  return ba;
+}
+
+// Month header
+const mh=document.createElement('div');
+mh.className='month-header';
+const mhn=document.createElement('div');mhn.className='mh-name';mhn.textContent='Vadfaj';
+mh.appendChild(mhn);
+const mhm=document.createElement('div');mhm.className='mh-months';
+for(let m=0;m<12;m++){
+  const d=document.createElement('div');
+  d.className='mh-month'+(m===TODAY.m-1?' current':'');
+  d.textContent=MN[m];
+  mhm.appendChild(d);
+}
+const tl=document.createElement('div');tl.className='today-line';tl.style.left=TODAY_PCT;
+const tlbl=document.createElement('div');tlbl.className='today-label';tlbl.textContent='Ma';tlbl.style.left=TODAY_PCT;
+mhm.appendChild(tl);mhm.appendChild(tlbl);
+mh.appendChild(mhm);
+chart.appendChild(mh);
+
+let gi=0;
+for(const g of groups){
+  gi++;
+  // group header
+  const gh=document.createElement('div');gh.className='group-header';
+  const gl=document.createElement('div');gl.className='group-label';
+  gl.innerHTML=`<span class="arrow">▾</span>${g.label}`;
+  gh.appendChild(gl);
+  const gba=document.createElement('div');gba.className='group-bar-area';
+  gba.appendChild(makeTodayLine());
+  gh.appendChild(gba);
+  chart.appendChild(gh);
+
+  const gbody=document.createElement('div');gbody.className='group-body';
+
+  for(const a of g.animals){
+    const row=document.createElement('div');row.className='animal-row';
+    const nd=document.createElement('div');nd.className='animal-name';
+    nd.innerHTML=a.name+(a.sub?`<span class="sub">${a.sub}</span>`:'');
+    row.appendChild(nd);
+
+    const ba=makeBarArea(38);
+    for(const s of segs(a.seasons)){
+      const bar=document.createElement('div');
+      bar.className='sbar';
+      bar.style.left=s.sp+'%';
+      bar.style.width=s.wp+'%';
+      bar.style.background=g.color;
+      bar.dataset.tip=`${a.name}: ${s.lbl}`;
+      ba.appendChild(bar);
+    }
+    row.appendChild(ba);
+    gbody.appendChild(row);
+  }
+
+  chart.appendChild(gbody);
+  gh.addEventListener('click',()=>{
+    const h=gbody.classList.toggle('hidden');
+    gl.classList.toggle('collapsed',h);
+  });
+}
+</script>
+</body>
+</html>
