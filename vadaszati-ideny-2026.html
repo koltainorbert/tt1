@@ -688,8 +688,19 @@
   </div>
 </div>
 
-<h1>VADKÁR <span>VADÁSZ</span></h1>
-<p class="subtitle">Vadászati idények 2026 &nbsp;·&nbsp; Magyar vadászati naptár &nbsp;·&nbsp; <span style="color:#ff0000;font-weight:700">|</span> = ma &nbsp;·&nbsp; Csoportokra kattintva össze/kibontható</p>
+<!-- HERO VIDEO -->
+<div id="hero">
+  <video autoplay muted loop playsinline preload="auto">
+    <source src="521380_Gun_Woman_1920x1080.mp4" type="video/mp4">
+  </video>
+  <div id="hero-overlay"></div>
+  <div id="hero-content">
+    <div id="hero-title">VADKÁR <span>VADÁSZ</span></div>
+    <div id="hero-sub">Vadászati idények 2026 &nbsp;·&nbsp; Magyarország &nbsp;·&nbsp; Magyar vadászati naptár</div>
+  </div>
+</div>
+
+<p class="subtitle">Csoportokra kattintva össze/kibontható &nbsp;·&nbsp; <span style="color:#ff0000;font-weight:700">|</span> = ma</p>
 
 <div class="legend">
   <div class="leg"><div class="leg-dot" style="background:#1ec854"></div>Gímszarvas</div>
@@ -724,13 +735,27 @@
 </footer>
 
 <script>
+// ── BUDAPEST TIMEZONE HELPER ─────────────────────────────
+// Automatikusan kezeli a téli (CET, UTC+1) és nyári (CEST, UTC+2) időszámítást
+function nowBP(){
+  const d=new Date();
+  const parts={};
+  new Intl.DateTimeFormat('en-US',{
+    timeZone:'Europe/Budapest',
+    year:'numeric',month:'2-digit',day:'2-digit',
+    hour:'2-digit',minute:'2-digit',second:'2-digit',
+    hour12:false
+  }).formatToParts(d).forEach(p=>{if(p.type!=='literal')parts[p.type]=+p.value;});
+  parts.weekday=new Intl.DateTimeFormat('hu-HU',{timeZone:'Europe/Budapest',weekday:'long'}).format(d);
+  return parts; // month: 1-12, hour: 0-23
+}
+
 // ── LIVE CLOCK ──────────────────────────────────────────────
 (function tick(){
-  const n=new Date();
-  const days=['vasárnap','hétfő','kedd','szerda','csütörtök','péntek','szombat'];
+  const n=nowBP();
   const months=['január','február','március','április','május','június','július','augusztus','szeptember','október','november','december'];
-  const dateStr=`${n.getFullYear()}. ${months[n.getMonth()]} ${n.getDate()}. &ndash; ${days[n.getDay()]}`;
-  const timeStr=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0');
+  const dateStr=`${n.year}. ${months[n.month-1]} ${n.day}. &ndash; ${n.weekday}`;
+  const timeStr=String(n.hour).padStart(2,'0')+':'+String(n.minute).padStart(2,'0')+':'+String(n.second).padStart(2,'0');
   document.getElementById('clk-date').innerHTML=dateStr;
   document.getElementById('clk-time').textContent=timeStr;
   setTimeout(tick,1000);
@@ -765,7 +790,8 @@ const MD=[31,isLeap(YEAR)?29:28,31,30,31,30,31,31,30,31,30,31];
 const MN=["Jan","Feb","Már","Ápr","Máj","Jún","Júl","Aug","Szep","Okt","Nov","Dec"];
 const MF=["Január","Február","Március","Április","Május","Június","Július","Augusztus","Szeptember","Október","November","December"];
 const TOTAL=MD.reduce((a,b)=>a+b,0);
-const TODAY={m:4,d:15};
+const _bp=nowBP();
+const TODAY={m:_bp.month,d:_bp.day};
 
 function doy(month,day){let i=0;for(let m=1;m<month;m++)i+=MD[m-1];return i+day-1;}
 function pct(d){return(d/TOTAL*100).toFixed(4)+'%'}
@@ -918,9 +944,10 @@ function buildTodayPanel(){
   panel.appendChild(hdr);
 
   function updateTPLive(){
-    const n=new Date();
+    const n=nowBP();
+    const MFH=['január','február','március','április','május','június','július','augusztus','szeptember','október','november','december'];
     const el=document.getElementById('tp-live');
-    if(el) el.textContent=`${n.getFullYear()}. ${MFH[n.getMonth()]} ${n.getDate()}., ${DH[n.getDay()]} – ${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;
+    if(el) el.textContent=`${n.year}. ${MFH[n.month-1]} ${n.day}., ${n.weekday} – ${String(n.hour).padStart(2,'0')}:${String(n.minute).padStart(2,'0')}`;
     const cnt=document.getElementById('tp-cnt');
     if(cnt) cnt.textContent=`(${open.length} vadfaj)`;
   }
