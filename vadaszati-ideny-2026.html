@@ -346,9 +346,193 @@
     .b-new{background:rgba(60,150,255,.18);color:#5db8ff}
     .b-soon{background:rgba(255,255,255,.06);color:rgba(255,255,255,.45)}
     .tp-empty{font-size:.78rem;color:rgba(255,255,255,.28);padding:12px 0}
+
+    /* ── INTRO ── */
+    #intro{
+      position:fixed;inset:0;z-index:9999;
+      background:#000;
+      display:flex;flex-direction:column;
+      align-items:center;justify-content:center;
+      overflow:hidden;
+      cursor:pointer;
+    }
+    #intro.fade-out{
+      animation:introFadeOut .9s ease-in forwards;
+    }
+    @keyframes introFadeOut{
+      0%{opacity:1;transform:scale(1);}
+      60%{opacity:.6;transform:scale(1.04);}
+      100%{opacity:0;transform:scale(1.08);pointer-events:none;}
+    }
+    #intro-bg{
+      position:absolute;inset:0;
+      background:radial-gradient(ellipse at center, rgba(80,30,0,.85) 0%, rgba(0,0,0,1) 70%);
+    }
+    /* scanlines */
+    #intro::before{
+      content:'';
+      position:absolute;inset:0;z-index:2;
+      background:repeating-linear-gradient(
+        0deg,
+        transparent,transparent 2px,
+        rgba(0,0,0,.18) 2px,rgba(0,0,0,.18) 4px
+      );
+      pointer-events:none;
+    }
+    #intro-logo{
+      position:relative;z-index:5;
+      max-width:min(700px,90vw);
+      width:100%;
+      animation:logoDrop .9s cubic-bezier(.16,1,.3,1) .2s both;
+      filter:drop-shadow(0 0 40px rgba(255,100,0,.6)) drop-shadow(0 0 80px rgba(255,40,0,.3));
+    }
+    @keyframes logoDrop{
+      0%{opacity:0;transform:scale(.7) translateY(-40px);}
+      100%{opacity:1;transform:scale(1) translateY(0);}
+    }
+    #intro-tagline{
+      position:relative;z-index:5;
+      margin-top:24px;
+      font-family:'Segoe UI',Arial,sans-serif;
+      font-size:clamp(.75rem,2.5vw,1.1rem);
+      font-weight:700;
+      letter-spacing:.35em;
+      text-transform:uppercase;
+      color:rgba(255,180,50,.9);
+      text-shadow:0 0 20px rgba(255,100,0,.8),0 0 60px rgba(255,50,0,.4);
+      animation:taglineIn .7s ease .9s both;
+    }
+    @keyframes taglineIn{
+      from{opacity:0;letter-spacing:.6em;}
+      to{opacity:1;letter-spacing:.35em;}
+    }
+    #intro-skip{
+      position:relative;z-index:5;
+      margin-top:32px;
+      font-family:'Segoe UI',Arial,sans-serif;
+      font-size:.7rem;letter-spacing:.18em;
+      color:rgba(255,255,255,.25);
+      animation:skipPulse 1.2s ease 1.6s both;
+      text-transform:uppercase;
+    }
+    @keyframes skipPulse{
+      0%{opacity:0;} 100%{opacity:1;}
+    }
+    #intro-timer{
+      position:relative;z-index:5;
+      margin-top:8px;
+      width:180px;height:2px;
+      background:rgba(255,255,255,.08);
+      border-radius:2px;
+      overflow:hidden;
+      animation:skipPulse 1.2s ease 1.6s both;
+    }
+    #intro-timer-bar{
+      height:100%;width:100%;
+      background:linear-gradient(90deg,#ff4400,#ffaa00);
+      transform-origin:left;
+      animation:timerBar 3.5s linear 1.6s forwards;
+    }
+    @keyframes timerBar{
+      from{transform:scaleX(1);} to{transform:scaleX(0);}
+    }
+
+    /* FIRE PARTICLES */
+    .spark{
+      position:absolute;
+      border-radius:50%;
+      pointer-events:none;
+      z-index:3;
+    }
   </style>
 </head>
 <body>
+
+<!-- ── INTRO ───────────────────────────────────────────── -->
+<div id="intro">
+  <div id="intro-bg"></div>
+  <canvas id="intro-canvas" style="position:absolute;inset:0;z-index:4;pointer-events:none;"></canvas>
+  <img id="intro-logo" src="vadkar-logo.png" alt="VADKÁR VADÁSZ 2026" onerror="this.style.display='none';document.getElementById('intro-logo-text').style.display='block';">
+  <div id="intro-logo-text" style="display:none;position:relative;z-index:5;text-align:center;">
+    <div style="font-family:'Segoe UI',Arial,sans-serif;font-size:clamp(2.5rem,10vw,5.5rem);font-weight:900;letter-spacing:.05em;text-transform:uppercase;background:linear-gradient(180deg,#ffcc00 0%,#ff6600 50%,#cc2200 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:none;line-height:1;">⚡ VADÁSZ</div>
+    <div style="font-family:'Segoe UI',Arial,sans-serif;font-size:clamp(1.2rem,4vw,2.5rem);font-weight:900;letter-spacing:.3em;color:#ff4400;margin-top:8px;">2026</div>
+  </div>
+  <div id="intro-tagline">&#127806; Vadászatra kész &mdash; minden nap &mdash; minden vad</div>
+  <div id="intro-skip">Kattints a belépéshez — vagy várj</div>
+  <div id="intro-timer"><div id="intro-timer-bar"></div></div>
+</div>
+
+<script>
+// ── INTRO LOGIC
+(function(){
+  const intro=document.getElementById('intro');
+  const canvas=document.getElementById('intro-canvas');
+  const ctx=canvas.getContext('2d');
+  let raf,dismissed=false;
+
+  function resize(){
+    canvas.width=window.innerWidth;
+    canvas.height=window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize',resize);
+
+  // Particles
+  const particles=[];
+  function mkParticle(){
+    const x=Math.random()*canvas.width;
+    const y=canvas.height+10;
+    const size=Math.random()*4+1;
+    const speed=Math.random()*2+1;
+    const life=Math.random()*80+60;
+    const hue=Math.random()*40+10; // orange-yellow
+    particles.push({x,y,size,speed,life,maxLife:life,hue,dx:(Math.random()-.5)*1.2});
+  }
+
+  function drawParticles(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    for(let i=particles.length-1;i>=0;i--){
+      const p=particles[i];
+      p.y-=p.speed;
+      p.x+=p.dx;
+      p.life--;
+      if(p.life<=0){particles.splice(i,1);continue;}
+      const alpha=(p.life/p.maxLife)*0.85;
+      const r=p.size*(p.life/p.maxLife);
+      const grd=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,r*3);
+      grd.addColorStop(0,`hsla(${p.hue},100%,90%,${alpha})`);
+      grd.addColorStop(.5,`hsla(${p.hue},100%,60%,${alpha*.6})`);
+      grd.addColorStop(1,`hsla(${p.hue},100%,40%,0)`);
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,r*3,0,Math.PI*2);
+      ctx.fillStyle=grd;
+      ctx.fill();
+    }
+  }
+
+  let lastSpawn=0;
+  function loop(ts){
+    if(dismissed) return;
+    if(ts-lastSpawn>18){mkParticle();mkParticle();lastSpawn=ts;}
+    drawParticles();
+    raf=requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+
+  // Dismiss
+  function dismiss(){
+    if(dismissed) return;
+    dismissed=true;
+    cancelAnimationFrame(raf);
+    intro.classList.add('fade-out');
+    setTimeout(()=>intro.remove(),950);
+  }
+
+  intro.addEventListener('click',dismiss);
+  // Auto dismiss after 3.5s intro anim + 1.6s delay = 5.1s
+  setTimeout(dismiss,5200);
+})();
+</script>
 
 <!-- TOPBAR -->
 <div class="topbar">
