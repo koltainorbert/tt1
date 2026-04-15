@@ -1,0 +1,1423 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VadászApró 2026 – Hirdetések vadászoknak</title>
+<style>
+:root{
+  --bg:rgb(6,6,6);--bg2:rgb(12,10,10);--bg3:rgb(20,14,14);
+  --border:rgba(255,255,255,.07);--border-r:rgba(255,0,0,.2);
+  --a:#ff0000;--a2:#ff4444;--a3:#ff6666;
+  --t:#fff;--t2:rgba(255,255,255,.65);--t3:rgba(255,255,255,.32);
+  --card:rgba(255,255,255,.025);--card-h:rgba(255,255,255,.05);
+  --r:10px;--r2:14px;
+  --nav:54px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  background:var(--bg);color:var(--t);min-height:100vh;
+  background-image:radial-gradient(circle,rgba(255,255,255,.04)1px,transparent 1px);
+  background-size:28px 28px;
+}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;font-family:inherit}
+input,textarea,select{font-family:inherit}
+img{display:block;max-width:100%}
+
+/* ── SCROLLBAR ─────────────────────────────────────── */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:rgba(255,0,0,.3);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:rgba(255,0,0,.5)}
+
+/* ── NAVBAR ────────────────────────────────────────── */
+#navbar{
+  position:fixed;top:0;left:0;right:0;z-index:300;
+  height:var(--nav);
+  background:rgba(6,4,4,.96);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border-r);
+  box-shadow:0 2px 40px rgba(0,0,0,.8);
+  display:flex;align-items:center;gap:16px;
+  padding:0 20px;
+}
+.nav-brand{
+  display:flex;align-items:center;gap:10px;flex-shrink:0;
+  text-decoration:none;
+}
+.nav-brand-icon{font-size:1.5rem}
+.nav-brand-name{
+  font-size:1.05rem;font-weight:900;letter-spacing:.1em;
+  text-transform:uppercase;color:#fff;
+}
+.nav-brand-name span{color:var(--a)}
+.nav-search{
+  flex:1;max-width:500px;
+  display:flex;align-items:center;
+  background:rgba(255,255,255,.05);
+  border:1px solid var(--border);
+  border-radius:8px;overflow:hidden;
+  transition:border-color .15s;
+}
+.nav-search:focus-within{border-color:rgba(255,0,0,.4)}
+.nav-search input{
+  flex:1;background:none;border:none;outline:none;
+  color:#fff;padding:0 14px;height:36px;font-size:.88rem;
+}
+.nav-search input::placeholder{color:var(--t3)}
+.nav-search button{
+  background:none;border:none;color:var(--t2);
+  padding:0 12px;height:36px;font-size:1rem;
+  transition:color .15s;
+}
+.nav-search button:hover{color:var(--a)}
+.nav-spacer{flex:1}
+.nav-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.btn-post{
+  background:var(--a);color:#fff;border:none;
+  padding:8px 16px;border-radius:7px;
+  font-size:.8rem;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;
+  transition:all .15s;
+  box-shadow:0 0 20px rgba(255,0,0,.3);
+}
+.btn-post:hover{background:#cc0000;box-shadow:0 0 28px rgba(255,0,0,.5)}
+.btn-auth{
+  background:rgba(255,255,255,.07);border:1px solid var(--border);
+  color:var(--t2);padding:8px 14px;border-radius:7px;
+  font-size:.8rem;font-weight:600;
+  transition:all .15s;
+}
+.btn-auth:hover{background:rgba(255,255,255,.12);color:#fff}
+.btn-profile{
+  display:flex;align-items:center;gap:7px;
+  background:rgba(255,0,0,.1);border:1px solid var(--border-r);
+  color:#fff;padding:6px 12px;border-radius:7px;
+  font-size:.8rem;font-weight:600;
+  transition:all .15s;
+}
+.btn-profile:hover{background:rgba(255,0,0,.18)}
+.avatar{
+  width:26px;height:26px;border-radius:50%;
+  background:linear-gradient(135deg,var(--a),#880000);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.75rem;font-weight:700;flex-shrink:0;
+}
+
+/* ── CATEGORY BAR ──────────────────────────────────── */
+#cat-bar{
+  position:fixed;top:var(--nav);left:0;right:0;z-index:200;
+  background:rgba(8,6,6,.97);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;
+  overflow-x:auto;gap:6px;padding:8px 20px;
+  scrollbar-width:none;
+}
+#cat-bar::-webkit-scrollbar{display:none}
+.cat-pill{
+  display:flex;align-items:center;gap:5px;
+  white-space:nowrap;flex-shrink:0;
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  border-radius:20px;padding:5px 12px;
+  font-size:.72rem;font-weight:600;color:var(--t2);
+  cursor:pointer;transition:all .15s;
+  letter-spacing:.03em;
+}
+.cat-pill:hover{background:rgba(255,0,0,.08);border-color:rgba(255,0,0,.3);color:#fff}
+.cat-pill.active{background:rgba(255,0,0,.15);border-color:rgba(255,0,0,.5);color:#fff;box-shadow:0 0 12px rgba(255,0,0,.15)}
+.cat-pill-icon{font-size:.9rem}
+
+/* ── MAIN LAYOUT ───────────────────────────────────── */
+#layout{
+  display:flex;gap:0;
+  padding-top:calc(var(--nav) + 48px);
+  min-height:100vh;
+}
+#sidebar{
+  width:220px;flex-shrink:0;
+  padding:20px 16px;
+  border-right:1px solid var(--border);
+  position:sticky;top:calc(var(--nav)+48px);
+  height:calc(100vh - var(--nav) - 48px);
+  overflow-y:auto;
+}
+#content{flex:1;padding:20px 24px;min-width:0}
+
+/* SIDEBAR */
+.filter-title{
+  font-size:.65rem;font-weight:700;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--t3);margin-bottom:10px;
+}
+.filter-group{margin-bottom:22px}
+.filter-label{font-size:.72rem;color:var(--t2);margin-bottom:5px;display:block}
+.filter-input{
+  width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);
+  border-radius:6px;color:#fff;padding:7px 10px;font-size:.78rem;outline:none;
+  transition:border-color .15s;
+}
+.filter-input:focus{border-color:rgba(255,0,0,.4)}
+.filter-input::placeholder{color:var(--t3)}
+.filter-row{display:flex;gap:6px}
+.filter-row .filter-input{flex:1}
+.filter-btn{
+  width:100%;background:rgba(255,0,0,.1);border:1px solid var(--border-r);
+  color:var(--a2);padding:8px;border-radius:6px;
+  font-size:.75rem;font-weight:600;letter-spacing:.04em;
+  transition:all .15s;margin-top:6px;
+}
+.filter-btn:hover{background:rgba(255,0,0,.2)}
+.filter-clear{
+  width:100%;background:none;border:none;
+  color:var(--t3);font-size:.7rem;margin-top:4px;
+  padding:4px;transition:color .15s;
+}
+.filter-clear:hover{color:var(--t2)}
+
+/* CAT GROUP SIDEBAR */
+.cat-group-lbl{
+  font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;
+  color:rgba(255,0,0,.5);margin-bottom:4px;margin-top:14px;font-weight:700;
+}
+.cat-item{
+  display:flex;align-items:center;gap:6px;
+  padding:5px 6px;border-radius:6px;cursor:pointer;
+  font-size:.73rem;color:var(--t2);transition:all .12s;
+}
+.cat-item:hover{background:rgba(255,255,255,.04);color:#fff}
+.cat-item.active{background:rgba(255,0,0,.1);color:var(--a2)}
+.cat-item-icon{font-size:.9rem;width:18px;text-align:center}
+
+/* ── CONTENT HEADER ────────────────────────────────── */
+.content-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:16px;flex-wrap:wrap;gap:10px;
+}
+.content-title{
+  font-size:.88rem;color:var(--t2);
+}
+.content-title b{color:#fff}
+.sort-select{
+  background:rgba(255,255,255,.05);border:1px solid var(--border);
+  color:#fff;padding:6px 10px;border-radius:6px;font-size:.75rem;outline:none;cursor:pointer;
+}
+.sort-select option{background:rgb(20,14,14)}
+
+/* ── LISTINGS GRID ─────────────────────────────────── */
+#listings-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:14px;
+}
+
+/* LISTING CARD */
+.listing-card{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--r);
+  overflow:hidden;cursor:pointer;
+  transition:transform .18s,border-color .18s,box-shadow .18s;
+  display:flex;flex-direction:column;
+}
+.listing-card:hover{
+  transform:translateY(-3px);
+  border-color:rgba(255,0,0,.3);
+  box-shadow:0 8px 30px rgba(0,0,0,.5),0 0 20px rgba(255,0,0,.08);
+}
+.card-img{
+  width:100%;height:180px;object-fit:cover;background:rgba(255,255,255,.03);
+  display:flex;align-items:center;justify-content:center;
+  font-size:3rem;color:rgba(255,255,255,.1);overflow:hidden;position:relative;
+}
+.card-img img{width:100%;height:100%;object-fit:cover}
+.card-img-placeholder{
+  width:100%;height:180px;
+  background:linear-gradient(135deg,rgba(255,255,255,.03),rgba(255,0,0,.04));
+  display:flex;align-items:center;justify-content:center;
+  font-size:2.5rem;filter:grayscale(1);opacity:.3;
+}
+.card-body{padding:12px 14px 14px;display:flex;flex-direction:column;flex:1}
+.card-cat{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  padding:3px 8px;border-radius:12px;margin-bottom:8px;
+  background:rgba(255,255,255,.07);color:var(--t2);
+  width:fit-content;
+}
+.card-title{
+  font-size:.88rem;font-weight:700;color:#fff;line-height:1.35;
+  margin-bottom:auto;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.card-price{
+  font-size:1.1rem;font-weight:900;color:var(--a2);
+  margin-top:10px;letter-spacing:.02em;
+}
+.card-price.free{color:#22cc66}
+.card-meta{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-top:6px;font-size:.65rem;color:var(--t3);
+  border-top:1px solid var(--border);padding-top:8px;
+}
+.card-location{display:flex;align-items:center;gap:3px}
+.card-views{display:flex;align-items:center;gap:3px}
+
+/* MINE badge */
+.card-mine-badge{
+  position:absolute;top:8px;right:8px;
+  background:rgba(255,0,0,.85);color:#fff;
+  font-size:.58rem;font-weight:700;padding:2px 7px;border-radius:10px;
+  letter-spacing:.06em;text-transform:uppercase;
+}
+.card-new-badge{
+  position:absolute;top:8px;left:8px;
+  background:rgba(0,200,80,.85);color:#fff;
+  font-size:.58rem;font-weight:700;padding:2px 7px;border-radius:10px;
+  letter-spacing:.06em;text-transform:uppercase;
+}
+
+/* ── EMPTY / LOADING ───────────────────────────────── */
+.empty-state{
+  grid-column:1/-1;text-align:center;padding:60px 20px;
+  color:var(--t3);
+}
+.empty-state .es-icon{font-size:3.5rem;margin-bottom:14px;opacity:.4}
+.empty-state .es-title{font-size:1rem;color:var(--t2);margin-bottom:6px}
+.empty-state .es-sub{font-size:.8rem}
+
+.skeleton{
+  background:linear-gradient(90deg,rgba(255,255,255,.04) 25%,rgba(255,255,255,.08) 50%,rgba(255,255,255,.04) 75%);
+  background-size:200% 100%;
+  animation:skel 1.4s ease infinite;
+  border-radius:6px;
+}
+@keyframes skel{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* ── PAGINATION ────────────────────────────────────── */
+#pagination{
+  display:flex;align-items:center;justify-content:center;
+  gap:6px;margin-top:28px;flex-wrap:wrap;
+}
+.pg-btn{
+  background:rgba(255,255,255,.05);border:1px solid var(--border);
+  color:var(--t2);padding:7px 14px;border-radius:7px;
+  font-size:.8rem;transition:all .15s;
+}
+.pg-btn:hover{background:rgba(255,0,0,.1);border-color:var(--border-r);color:#fff}
+.pg-btn.active{background:rgba(255,0,0,.15);border-color:rgba(255,0,0,.4);color:#fff;font-weight:700}
+.pg-btn:disabled{opacity:.3;cursor:default}
+
+/* ── MODALS BASE ───────────────────────────────────── */
+.modal-overlay{
+  position:fixed;inset:0;z-index:500;
+  background:rgba(0,0,0,.8);backdrop-filter:blur(8px);
+  display:none;align-items:center;justify-content:center;padding:20px;
+  opacity:0;transition:opacity .25s;
+}
+.modal-overlay.open{display:flex}
+.modal-overlay.visible{opacity:1}
+.modal-box{
+  background:linear-gradient(160deg,rgb(16,8,8),rgb(8,6,6));
+  border:1px solid var(--border-r);border-radius:var(--r2);
+  width:100%;max-width:480px;
+  max-height:90vh;overflow-y:auto;
+  box-shadow:0 0 80px rgba(255,0,0,.12),0 24px 80px rgba(0,0,0,.8);
+  animation:modal-in .3s cubic-bezier(.22,1,.36,1) both;
+  position:relative;
+}
+@keyframes modal-in{from{transform:scale(.93) translateY(16px);opacity:0}to{transform:none;opacity:1}}
+.modal-box.wide{max-width:700px}
+.modal-box.xlwide{max-width:920px}
+.modal-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:20px 24px 0;
+}
+.modal-title{font-size:1rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+.modal-close{
+  background:rgba(255,255,255,.06);border:1px solid var(--border);
+  color:var(--t2);width:32px;height:32px;border-radius:50%;
+  font-size:1.1rem;display:flex;align-items:center;justify-content:center;
+  transition:all .15s;flex-shrink:0;
+}
+.modal-close:hover{background:rgba(255,0,0,.15);color:#fff;border-color:var(--border-r)}
+.modal-body{padding:20px 24px 24px}
+
+/* FORM ELEMENTS */
+.form-group{margin-bottom:16px}
+.form-label{
+  display:block;font-size:.72rem;font-weight:700;
+  color:var(--t2);margin-bottom:6px;letter-spacing:.04em;text-transform:uppercase;
+}
+.form-input{
+  width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);
+  border-radius:8px;color:#fff;padding:10px 13px;font-size:.88rem;outline:none;
+  transition:border-color .15s,box-shadow .15s;
+}
+.form-input:focus{border-color:rgba(255,0,0,.5);box-shadow:0 0 0 3px rgba(255,0,0,.1)}
+.form-input::placeholder{color:var(--t3)}
+.form-textarea{min-height:110px;resize:vertical}
+.form-select{appearance:none;cursor:pointer}
+.form-error{
+  font-size:.72rem;color:#ff5050;margin-top:5px;
+  display:none;
+}
+.form-row{display:flex;gap:12px}
+.form-row .form-group{flex:1}
+
+/* Submit button */
+.btn-submit{
+  width:100%;background:var(--a);color:#fff;border:none;
+  padding:12px;border-radius:8px;font-size:.9rem;font-weight:700;
+  letter-spacing:.06em;text-transform:uppercase;
+  box-shadow:0 0 24px rgba(255,0,0,.3);
+  transition:all .15s;margin-top:4px;
+}
+.btn-submit:hover{background:#cc0000;box-shadow:0 0 32px rgba(255,0,0,.45)}
+.btn-submit:disabled{opacity:.5;cursor:default}
+.btn-secondary{
+  width:100%;background:rgba(255,255,255,.08);border:1px solid var(--border);
+  color:var(--t2);padding:11px;border-radius:8px;font-size:.88rem;font-weight:600;
+  transition:all .15s;
+}
+.btn-secondary:hover{background:rgba(255,255,255,.12);color:#fff}
+
+/* ── AUTH TABS ─────────────────────────────────────── */
+.auth-tabs{display:flex;gap:0;margin-bottom:20px;border-bottom:1px solid var(--border)}
+.auth-tab{
+  flex:1;text-align:center;padding:10px;
+  font-size:.82rem;font-weight:700;letter-spacing:.05em;
+  color:var(--t3);cursor:pointer;
+  border-bottom:2px solid transparent;margin-bottom:-1px;
+  transition:all .15s;
+}
+.auth-tab.active{color:#fff;border-color:var(--a)}
+.auth-tab:hover:not(.active){color:var(--t2)}
+
+/* ── IMAGE UPLOAD ──────────────────────────────────── */
+.img-dropzone{
+  border:2px dashed rgba(255,255,255,.15);border-radius:8px;
+  padding:24px;text-align:center;cursor:pointer;
+  transition:all .2s;position:relative;
+}
+.img-dropzone:hover,.img-dropzone.drag-over{
+  border-color:rgba(255,0,0,.4);background:rgba(255,0,0,.04);
+}
+.img-dropzone input[type=file]{
+  position:absolute;inset:0;opacity:0;cursor:pointer;z-index:1;
+}
+.img-dz-icon{font-size:2rem;margin-bottom:8px;opacity:.5}
+.img-dz-text{font-size:.78rem;color:var(--t2);margin-bottom:4px}
+.img-dz-sub{font-size:.65rem;color:var(--t3)}
+.img-preview-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;
+}
+.img-preview{
+  aspect-ratio:1;border-radius:6px;overflow:hidden;
+  background:rgba(255,255,255,.05);border:1px solid var(--border);
+  position:relative;
+}
+.img-preview img{width:100%;height:100%;object-fit:cover}
+.img-preview-remove{
+  position:absolute;top:4px;right:4px;
+  background:rgba(0,0,0,.7);border:none;color:#fff;
+  width:22px;height:22px;border-radius:50%;font-size:.7rem;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;z-index:2;transition:background .12s;
+}
+.img-preview-remove:hover{background:rgba(255,0,0,.8)}
+
+/* ── LISTING DETAIL MODAL ──────────────────────────── */
+#modal-detail .modal-box{max-width:820px}
+.detail-gallery{
+  width:100%;height:360px;
+  background:#000;overflow:hidden;position:relative;
+  border-radius:var(--r2) var(--r2) 0 0;
+}
+.detail-gallery img{
+  width:100%;height:100%;object-fit:contain;
+  background:rgba(0,0,0,.95);
+}
+.detail-gallery-placeholder{
+  width:100%;height:100%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:4rem;opacity:.2;
+}
+.gallery-nav{
+  position:absolute;top:50%;transform:translateY(-50%);
+  background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.15);
+  color:#fff;width:36px;height:36px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.9rem;cursor:pointer;transition:all .15s;z-index:2;
+}
+.gallery-nav:hover{background:rgba(255,0,0,.5)}
+.gallery-nav.prev{left:12px}
+.gallery-nav.next{right:12px}
+.gallery-dots{
+  position:absolute;bottom:10px;left:50%;transform:translateX(-50%);
+  display:flex;gap:5px;
+}
+.gallery-dot{
+  width:7px;height:7px;border-radius:50%;
+  background:rgba(255,255,255,.3);cursor:pointer;transition:background .15s;
+}
+.gallery-dot.active{background:#fff}
+.detail-body{padding:22px 26px 26px}
+.detail-cat{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
+  background:rgba(255,0,0,.1);border:1px solid rgba(255,0,0,.2);
+  color:var(--a3);padding:4px 10px;border-radius:12px;margin-bottom:12px;
+}
+.detail-title{font-size:1.3rem;font-weight:800;line-height:1.3;margin-bottom:8px}
+.detail-price{
+  font-size:1.8rem;font-weight:900;color:var(--a2);margin-bottom:14px;
+}
+.detail-price.free{color:#22cc66}
+.detail-meta-row{
+  display:flex;flex-wrap:wrap;gap:12px;
+  margin-bottom:16px;padding-bottom:16px;
+  border-bottom:1px solid var(--border);
+}
+.detail-meta-item{
+  display:flex;align-items:center;gap:5px;
+  font-size:.75rem;color:var(--t2);
+}
+.detail-desc{
+  font-size:.88rem;color:var(--t2);line-height:1.65;
+  white-space:pre-wrap;word-break:break-word;
+  margin-bottom:20px;
+}
+.detail-seller{
+  background:rgba(255,255,255,.03);border:1px solid var(--border);
+  border-radius:var(--r);padding:14px 16px;margin-bottom:18px;
+}
+.detail-seller-name{font-size:.88rem;font-weight:700;margin-bottom:4px}
+.detail-seller-phone{font-size:.82rem;color:var(--a3)}
+.detail-seller-joined{font-size:.68rem;color:var(--t3);margin-top:4px}
+.detail-contact-title{
+  font-size:.75rem;font-weight:700;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--t2);margin-bottom:12px;
+}
+.detail-actions{display:flex;gap:10px;margin-top:16px}
+.btn-danger{
+  background:rgba(255,40,40,.1);border:1px solid rgba(255,40,40,.3);
+  color:#ff6060;padding:10px 16px;border-radius:7px;
+  font-size:.78rem;font-weight:600;transition:all .15s;
+}
+.btn-danger:hover{background:rgba(255,40,40,.2)}
+
+/* ── TOAST ─────────────────────────────────────────── */
+#toast-container{
+  position:fixed;bottom:24px;right:24px;z-index:9999;
+  display:flex;flex-direction:column;gap:8px;pointer-events:none;
+}
+.toast{
+  background:rgba(20,14,14,.97);border:1px solid var(--border);
+  border-radius:8px;padding:12px 16px;
+  font-size:.82rem;color:#fff;min-width:220px;max-width:320px;
+  box-shadow:0 4px 24px rgba(0,0,0,.6);
+  animation:toast-in .3s ease both;
+  pointer-events:all;
+}
+.toast.success{border-color:rgba(0,200,80,.4)}
+.toast.error{border-color:rgba(255,0,0,.4)}
+.toast-icon{margin-right:8px}
+@keyframes toast-in{from{transform:translateX(30px);opacity:0}to{transform:none;opacity:1}}
+@keyframes toast-out{to{transform:translateX(30px);opacity:0}}
+
+/* ── PROFILE PANEL ─────────────────────────────────── */
+.profile-section{margin-bottom:20px}
+.profile-section-title{
+  font-size:.65rem;font-weight:700;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--t3);
+  margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);
+}
+.profile-stat-row{display:flex;gap:16px;margin-bottom:16px}
+.profile-stat{
+  flex:1;background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r);padding:12px 14px;text-align:center;
+}
+.profile-stat-n{font-size:1.8rem;font-weight:900;color:var(--a2)}
+.profile-stat-l{font-size:.65rem;color:var(--t3)}
+
+/* mini listing in profile */
+.mini-listing{
+  display:flex;align-items:center;gap:12px;
+  padding:10px;border-radius:8px;cursor:pointer;
+  border:1px solid var(--border);margin-bottom:8px;
+  background:var(--card);transition:all .15s;
+}
+.mini-listing:hover{border-color:rgba(255,0,0,.25);background:var(--card-h)}
+.mini-listing-img{
+  width:56px;height:46px;border-radius:6px;
+  background:rgba(255,255,255,.05);display:flex;align-items:center;
+  justify-content:center;font-size:1.2rem;flex-shrink:0;overflow:hidden;
+}
+.mini-listing-img img{width:100%;height:100%;object-fit:cover}
+.mini-listing-info{flex:1;min-width:0}
+.mini-listing-title{font-size:.78rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mini-listing-price{font-size:.72rem;color:var(--a3)}
+.mini-listing-del{
+  background:rgba(255,40,40,.1);border:1px solid rgba(255,40,40,.2);
+  color:#ff6060;padding:4px 8px;border-radius:5px;
+  font-size:.65rem;flex-shrink:0;transition:all .12s;
+}
+.mini-listing-del:hover{background:rgba(255,40,40,.2)}
+
+/* ── RESPONSIVE ─────────────────────────────────────── */
+@media(max-width:900px){
+  #sidebar{display:none}
+  #content{padding:16px}
+}
+@media(max-width:600px){
+  #navbar{padding:0 12px;gap:8px}
+  .nav-brand-name{font-size:.9rem}
+  .nav-search{max-width:none;flex:1}
+  .btn-post{padding:7px 10px;font-size:.72rem}
+  .btn-auth{padding:7px 10px;font-size:.72rem}
+  #listings-grid{grid-template-columns:1fr 1fr;gap:10px}
+  .card-img,.card-img-placeholder{height:140px}
+  .modal-box{max-width:100%;margin:0;border-radius:var(--r2) var(--r2) 0 0;margin-top:auto}
+  .modal-overlay{align-items:flex-end;padding:0}
+  .detail-gallery{height:240px}
+  .detail-title{font-size:1.1rem}
+}
+@media(max-width:380px){
+  #listings-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <a class="nav-brand" href="#" onclick="goHome();return false;">
+    <span class="nav-brand-icon">🦌</span>
+    <span class="nav-brand-name">VADÁSZ<span>APRÓ</span></span>
+  </a>
+  <div class="nav-search">
+    <input type="text" id="search-input" placeholder="Keresés hirdetések között...">
+    <button id="search-btn" title="Keresés">🔍</button>
+  </div>
+  <div class="nav-spacer"></div>
+  <div class="nav-actions">
+    <button class="btn-post" id="btn-new-listing">+ Hirdetés feladása</button>
+    <div id="auth-ui"></div>
+  </div>
+</nav>
+
+<!-- CATEGORY BAR -->
+<div id="cat-bar"></div>
+
+<!-- MAIN LAYOUT -->
+<div id="layout">
+  <aside id="sidebar">
+    <div class="filter-group">
+      <div class="filter-title">Szűrők</div>
+      <label class="filter-label">Keresés</label>
+      <input class="filter-input" id="sidebar-search" type="text" placeholder="Kulcsszó...">
+    </div>
+    <div class="filter-group">
+      <label class="filter-label">Ár (Ft)</label>
+      <div class="filter-row">
+        <input class="filter-input" id="price-min" type="number" placeholder="Min">
+        <input class="filter-input" id="price-max" type="number" placeholder="Max">
+      </div>
+    </div>
+    <div class="filter-group">
+      <label class="filter-label">Helyszín</label>
+      <input class="filter-input" id="loc-filter" type="text" placeholder="Város, megye...">
+    </div>
+    <button class="filter-btn" onclick="applyFilters()">Szűrés alkalmazása</button>
+    <button class="filter-clear" onclick="clearFilters()">✕ Szűrők törlése</button>
+    <div style="margin-top:20px">
+      <div class="filter-title">Kategóriák</div>
+      <div id="sidebar-cats"></div>
+    </div>
+  </aside>
+  <main id="content">
+    <div class="content-header">
+      <div class="content-title" id="content-title">Összes hirdetés</div>
+      <select class="sort-select" id="sort-select" onchange="sortChanged()">
+        <option value="new">Legújabb</option>
+        <option value="old">Legrégebbi</option>
+        <option value="price_asc">Ár: növekvő</option>
+        <option value="price_desc">Ár: csökkenő</option>
+        <option value="views">Legtöbb megtekintés</option>
+      </select>
+    </div>
+    <div id="listings-grid"></div>
+    <div id="pagination"></div>
+  </main>
+</div>
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="modal-auth" onclick="overlayClick(event,'auth')">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div class="modal-title" id="auth-modal-title">Bejelentkezés</div>
+      <button class="modal-close" onclick="closeModal('auth')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="auth-tabs">
+        <div class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Bejelentkezés</div>
+        <div class="auth-tab" id="tab-register" onclick="switchAuthTab('register')">Regisztráció</div>
+      </div>
+      <!-- LOGIN -->
+      <div id="form-login">
+        <div class="form-group">
+          <label class="form-label">Email cím</label>
+          <input class="form-input" id="login-email" type="email" placeholder="pelda@email.hu" autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Jelszó</label>
+          <input class="form-input" id="login-pass" type="password" placeholder="••••••••" autocomplete="current-password">
+        </div>
+        <div class="form-error" id="login-error"></div>
+        <button class="btn-submit" id="btn-login" onclick="doLogin()">Bejelentkezés</button>
+      </div>
+      <!-- REGISTER -->
+      <div id="form-register" style="display:none">
+        <div class="form-group">
+          <label class="form-label">Teljes név</label>
+          <input class="form-input" id="reg-name" type="text" placeholder="Kiss János" autocomplete="name">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email cím</label>
+          <input class="form-input" id="reg-email" type="email" placeholder="pelda@email.hu" autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Telefonszám (opcionális)</label>
+          <input class="form-input" id="reg-phone" type="tel" placeholder="+36 30 123 4567">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Jelszó (min. 6 karakter)</label>
+          <input class="form-input" id="reg-pass" type="password" placeholder="••••••••" autocomplete="new-password">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Jelszó megerősítése</label>
+          <input class="form-input" id="reg-pass2" type="password" placeholder="••••••••" autocomplete="new-password">
+        </div>
+        <div class="form-error" id="reg-error"></div>
+        <button class="btn-submit" id="btn-register" onclick="doRegister()">Fiók létrehozása</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NEW LISTING MODAL -->
+<div class="modal-overlay" id="modal-new-listing" onclick="overlayClick(event,'new-listing')">
+  <div class="modal-box wide">
+    <div class="modal-head">
+      <div class="modal-title">Hirdetés feladása</div>
+      <button class="modal-close" onclick="closeModal('new-listing')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Cím *</label>
+        <input class="form-input" id="nl-title" type="text" placeholder="pl. Swarovski 8x42 EL keresőtávcső" maxlength="120">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Kategória *</label>
+          <select class="form-input form-select" id="nl-cat"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Ár (Ft)</label>
+          <input class="form-input" id="nl-price" type="number" placeholder="0 = Ingyenes / Csere" min="0">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Helyszín</label>
+        <input class="form-input" id="nl-loc" type="text" placeholder="pl. Budapest, Pest megye">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Leírás</label>
+        <textarea class="form-input form-textarea" id="nl-desc" placeholder="Részletes leírás, állapot, elérhetőség..."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Képek (max. 6 db, max. 8 MB/kép)</label>
+        <div class="img-dropzone" id="img-dropzone">
+          <input type="file" id="nl-images" accept="image/*" multiple>
+          <div class="img-dz-icon">📷</div>
+          <div class="img-dz-text">Kattints vagy húzd ide a képeket</div>
+          <div class="img-dz-sub">JPG, PNG, WEBP • max. 8 MB/kép • max. 6 kép</div>
+        </div>
+        <div class="img-preview-grid" id="img-preview-grid"></div>
+      </div>
+      <div class="form-error" id="nl-error"></div>
+      <button class="btn-submit" id="btn-nl-submit" onclick="doNewListing()">Hirdetés feladása</button>
+    </div>
+  </div>
+</div>
+
+<!-- LISTING DETAIL MODAL -->
+<div class="modal-overlay" id="modal-detail" onclick="overlayClick(event,'detail')">
+  <div class="modal-box xlwide">
+    <div class="modal-head" style="position:absolute;top:8px;right:8px;z-index:3;padding:0">
+      <button class="modal-close" onclick="closeModal('detail')">✕</button>
+    </div>
+    <div id="detail-content"></div>
+  </div>
+</div>
+
+<!-- PROFILE MODAL -->
+<div class="modal-overlay" id="modal-profile" onclick="overlayClick(event,'profile')">
+  <div class="modal-box wide">
+    <div class="modal-head">
+      <div class="modal-title">Profilom</div>
+      <button class="modal-close" onclick="closeModal('profile')">✕</button>
+    </div>
+    <div class="modal-body" id="profile-content"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast-container"></div>
+
+<script>
+// ── CONSTANTS ─────────────────────────────────────────────
+const API = '';
+const CATS = [
+  {id:'golyos-puska',     label:'Golyós puska',         icon:'🎯', group:'Fegyverek'},
+  {id:'soretes-puska',    label:'Sörétes puska',         icon:'🔫', group:'Fegyverek'},
+  {id:'vegyescsovu',      label:'Vegyescsövű',           icon:'🎯', group:'Fegyverek'},
+  {id:'maroklofegyver',   label:'Maroklőfegyver',        icon:'🔫', group:'Fegyverek'},
+  {id:'egyeb-fegyver',    label:'Egyéb fegyver',         icon:'⚙️', group:'Fegyverek'},
+  {id:'loszer',           label:'Lőszer-Töltény',        icon:'🔴', group:'Optika & Kellékek'},
+  {id:'kesek',            label:'Kések',                 icon:'🔪', group:'Optika & Kellékek'},
+  {id:'tavcsovek',        label:'Távcsövek',             icon:'🔭', group:'Optika & Kellékek'},
+  {id:'ejjellato',        label:'Éjjellátó',             icon:'👁️', group:'Optika & Kellékek'},
+  {id:'hokamera',         label:'Hőkamera',              icon:'🌡️', group:'Optika & Kellékek'},
+  {id:'vadkamera',        label:'Vadkamera',             icon:'📷', group:'Optika & Kellékek'},
+  {id:'vadaszlampa',      label:'Vadászlámpa',           icon:'💡', group:'Optika & Kellékek'},
+  {id:'vadasz-ruhazat',   label:'Vadász ruházat',        icon:'🧥', group:'Ruházat'},
+  {id:'cipo-bakancs',     label:'Cipő, Bakancs',         icon:'👢', group:'Ruházat'},
+  {id:'egyeb-ruhazat',    label:'Egyéb ruházat',         icon:'👕', group:'Ruházat'},
+  {id:'vadasz-felsz',     label:'Vadász felszerelés',    icon:'🎒', group:'Felszerelés'},
+  {id:'sportlovo-felsz',  label:'Sportlövő felsz.',      icon:'🏆', group:'Felszerelés'},
+  {id:'trofea',           label:'Trófea alátét',         icon:'🦌', group:'Felszerelés'},
+  {id:'vadasz-kutya',     label:'Vadászkutya',           icon:'🐕', group:'Állatok'},
+  {id:'vadasz-lehetoseg', label:'Vadászati lehetőség',   icon:'🌲', group:'Lehetőségek'},
+  {id:'vadkarelharias',   label:'Vadkárelhárítás',       icon:'⚡', group:'Lehetőségek'},
+  {id:'szallas',          label:'Szállás',               icon:'🏡', group:'Lehetőségek'},
+  {id:'ingatlan',         label:'Ingatlan',              icon:'🏘️', group:'Lehetőségek'},
+  {id:'jarmu',            label:'Jármű',                 icon:'🚙', group:'Egyéb'},
+  {id:'takarmany',        label:'Takarmány',             icon:'🌾', group:'Egyéb'},
+  {id:'konyv',            label:'Könyv-Folyóirat',       icon:'📚', group:'Egyéb'},
+  {id:'disztargy',        label:'Dísztárgyak',           icon:'🏺', group:'Egyéb'},
+  {id:'kurtok-sipok',     label:'Kürtök, Sípok',         icon:'📯', group:'Egyéb'},
+  {id:'szolgaltatas',     label:'Szolgáltatás',          icon:'🔧', group:'Egyéb'},
+  {id:'allas',            label:'Állás',                 icon:'💼', group:'Egyéb'},
+  {id:'csere',            label:'Csere',                 icon:'🔄', group:'Egyéb'},
+  {id:'hagyatek',         label:'Vadászati hagyaték',    icon:'📦', group:'Egyéb'},
+  {id:'egyeb',            label:'Egyéb',                 icon:'📌', group:'Egyéb'},
+];
+const catMap = Object.fromEntries(CATS.map(c => [c.id, c]));
+
+// ── STATE ─────────────────────────────────────────────────
+const state = {
+  user:    null,
+  token:   localStorage.getItem('vap_token'),
+  listings:[],
+  total:   0,
+  page:    1,
+  pages:   1,
+  filter:  { category:'', search:'', sort:'new' },
+  loading: false,
+  pendingImages: [],  // File objects for upload
+};
+
+// ── API ───────────────────────────────────────────────────
+async function api(method, url, data, multipart=false){
+  const opts = { method, headers:{} };
+  if(state.token) opts.headers['Authorization'] = 'Bearer ' + state.token;
+  if(data){
+    if(multipart){ opts.body = data; }
+    else { opts.headers['Content-Type']='application/json'; opts.body=JSON.stringify(data); }
+  }
+  const res = await fetch(API + url, opts);
+  const json = await res.json().catch(()=>({error:'Érvénytelen válasz'}));
+  if(!res.ok) throw new Error(json.error || 'Hiba');
+  return json;
+}
+
+// ── HELPERS ───────────────────────────────────────────────
+function fmtPrice(p){
+  if(!p || p===0) return '<span style="color:#22cc66">Ingyenes / Csere</span>';
+  return new Intl.NumberFormat('hu-HU').format(p) + ' Ft';
+}
+function fmtPriceText(p){
+  if(!p || p===0) return 'Ingyenes';
+  return new Intl.NumberFormat('hu-HU').format(p) + ' Ft';
+}
+function timeAgo(dateStr){
+  const diff = Date.now() - new Date(dateStr+'Z').getTime();
+  const m=Math.floor(diff/60000), h=Math.floor(diff/3600000), d=Math.floor(diff/86400000);
+  if(m<2) return 'most';
+  if(m<60) return m+' perce';
+  if(h<24) return h+' órája';
+  if(d<30) return d+' napja';
+  return new Date(dateStr).toLocaleDateString('hu-HU');
+}
+function isNew(dateStr){
+  return Date.now()-new Date(dateStr+'Z').getTime() < 86400000;
+}
+function catLabel(id){ return catMap[id]?.label || id; }
+function catIcon(id){ return catMap[id]?.icon || '📌'; }
+
+// ── CATEGORY BAR ──────────────────────────────────────────
+function renderCatBar(){
+  const bar = document.getElementById('cat-bar');
+  bar.innerHTML = '<div class="cat-pill'+(state.filter.category===''?' active':'')+'" onclick="setCategory(\'\')"><span class="cat-pill-icon">🔍</span>Összes</div>'
+    + CATS.map(c=>`<div class="cat-pill${state.filter.category===c.id?' active':''}" onclick="setCategory('${c.id}')"><span class="cat-pill-icon">${c.icon}</span>${c.label}</div>`).join('');
+}
+function renderSidebarCats(){
+  const el = document.getElementById('sidebar-cats');
+  const groups = [...new Set(CATS.map(c=>c.group))];
+  el.innerHTML = groups.map(g=>`
+    <div class="cat-group-lbl">${g}</div>
+    ${CATS.filter(c=>c.group===g).map(c=>`
+      <div class="cat-item${state.filter.category===c.id?' active':''}" onclick="setCategory('${c.id}')">
+        <span class="cat-item-icon">${c.icon}</span>${c.label}
+      </div>`).join('')}
+  `).join('');
+}
+function setCategory(id){
+  state.filter.category = id;
+  state.page = 1;
+  renderCatBar();
+  renderSidebarCats();
+  loadListings();
+}
+
+// ── LISTINGS ──────────────────────────────────────────────
+async function loadListings(){
+  if(state.loading) return;
+  state.loading = true;
+  const grid = document.getElementById('listings-grid');
+  // skeleton
+  grid.innerHTML = Array(12).fill(0).map(()=>`
+    <div class="listing-card" style="pointer-events:none">
+      <div class="skeleton" style="height:180px"></div>
+      <div class="card-body">
+        <div class="skeleton" style="height:14px;width:60%;margin-bottom:8px"></div>
+        <div class="skeleton" style="height:18px;margin-bottom:6px"></div>
+        <div class="skeleton" style="height:14px;width:40%"></div>
+      </div>
+    </div>`).join('');
+
+  const params = new URLSearchParams({
+    page: state.page,
+    sort: state.filter.sort,
+    ...(state.filter.category && {category: state.filter.category}),
+    ...(state.filter.search   && {search: state.filter.search}),
+  });
+  try {
+    const data = await api('GET', `/api/listings?${params}`);
+    state.listings = data.listings;
+    state.total    = data.total;
+    state.pages    = data.pages;
+    renderListings();
+    renderPagination();
+    renderContentTitle();
+  } catch(e){
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="es-icon">⚠️</div><div class="es-title">Betöltési hiba</div><div class="es-sub">${e.message}</div></div>`;
+  }
+  state.loading = false;
+}
+
+function renderListings(){
+  const grid = document.getElementById('listings-grid');
+  if(!state.listings.length){
+    grid.innerHTML = `<div class="empty-state"><div class="es-icon">🔍</div><div class="es-title">Nem találtunk hirdetést</div><div class="es-sub">Próbálj más kulcsszót vagy kategóriát</div></div>`;
+    return;
+  }
+  grid.innerHTML = state.listings.map(l=>{
+    const img = l.images && l.images.length
+      ? `<img src="${l.images[0]}" alt="${l.title}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'img-dz-icon\\'>${catIcon(l.category)}</div>'">`
+      : `<div class="img-dz-icon">${catIcon(l.category)}</div>`;
+    const newBadge = isNew(l.created_at) ? '<div class="card-new-badge">ÚJ</div>' : '';
+    const mineBadge = l.isMine ? '<div class="card-mine-badge">Enyém</div>' : '';
+    return `<div class="listing-card" onclick="openDetail(${l.id})">
+      <div class="card-img" style="position:relative">${img}${newBadge}${mineBadge}</div>
+      <div class="card-body">
+        <div class="card-cat">${catIcon(l.category)} ${catLabel(l.category)}</div>
+        <div class="card-title">${esc(l.title)}</div>
+        <div class="card-price${!l.price?' free':''}">${fmtPrice(l.price)}</div>
+        <div class="card-meta">
+          <span class="card-location">📍 ${esc(l.location||'Nem megadva')}</span>
+          <span class="card-views">👁 ${l.views}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderContentTitle(){
+  const el = document.getElementById('content-title');
+  const cat = state.filter.category ? catLabel(state.filter.category) : 'Összes hirdetés';
+  el.innerHTML = `<b>${cat}</b> — ${state.total} hirdetés`;
+}
+
+function renderPagination(){
+  const el = document.getElementById('pagination');
+  if(state.pages <= 1){ el.innerHTML=''; return; }
+  const pages = [];
+  for(let i=1; i<=state.pages; i++){
+    if(i===1||i===state.pages||Math.abs(i-state.page)<=2) pages.push(i);
+    else if(pages[pages.length-1]!=='…') pages.push('…');
+  }
+  el.innerHTML = `
+    <button class="pg-btn" ${state.page===1?'disabled':''} onclick="goPage(${state.page-1})">◀</button>
+    ${pages.map(p=>p==='…'?`<span style="padding:7px 4px;color:var(--t3)">…</span>`
+      :`<button class="pg-btn${p===state.page?' active':''}" onclick="goPage(${p})">${p}</button>`).join('')}
+    <button class="pg-btn" ${state.page===state.pages?'disabled':''} onclick="goPage(${state.page+1})">▶</button>`;
+}
+
+function goPage(p){
+  if(p<1||p>state.pages) return;
+  state.page=p;
+  loadListings();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── DETAIL ────────────────────────────────────────────────
+let detailGalleryIdx = 0;
+async function openDetail(id){
+  openModal('detail');
+  document.getElementById('detail-content').innerHTML=`<div style="padding:60px;text-align:center;color:var(--t3)">⏳ Betöltés...</div>`;
+  try {
+    const l = await api('GET', `/api/listings/${id}`);
+    detailGalleryIdx = 0;
+    renderDetail(l);
+  } catch(e){
+    document.getElementById('detail-content').innerHTML=`<div style="padding:40px;text-align:center;color:#ff5050">${e.message}</div>`;
+  }
+}
+
+function renderDetail(l){
+  const imgs = l.images || [];
+  const galleryHTML = imgs.length
+    ? `<img id="det-img" src="${imgs[0]}" alt="${esc(l.title)}" onerror="this.src=''">
+       ${imgs.length>1?`<button class="gallery-nav prev" onclick="detGallery(-1)">◀</button><button class="gallery-nav next" onclick="detGallery(1)">▶</button>`:''}
+       ${imgs.length>1?`<div class="gallery-dots">${imgs.map((_,i)=>`<div class="gallery-dot${i===0?' active':''}" onclick="detGalleryGo(${i})"></div>`).join('')}</div>`:''}`
+    : `<div class="detail-gallery-placeholder">${catIcon(l.category)}</div>`;
+
+  const contactSection = state.user
+    ? `<div class="detail-contact-title">📩 Üzenet küldése a hirdetőnek</div>
+       <div class="form-group"><textarea class="form-input form-textarea" id="msg-text" placeholder="Érdeklődöm a hirdetése iránt..."></textarea></div>
+       <button class="btn-submit" onclick="sendMessage(${l.id})" style="margin-top:0">Üzenet küldése</button>`
+    : `<div style="background:rgba(255,0,0,.06);border:1px solid rgba(255,0,0,.15);border-radius:8px;padding:14px;text-align:center;font-size:.82rem;color:var(--t2)">
+         Jelentkezz be az elérhetőségek megtekintéséhez és üzenet küldéséhez
+         <br><button class="btn-submit" onclick="closeModal('detail');openModal('auth')" style="margin-top:12px;padding:8px">Bejelentkezés</button>
+       </div>`;
+
+  const mineActions = l.isMine
+    ? `<div class="detail-actions"><button class="btn-danger" onclick="deleteListing(${l.id})">🗑️ Hirdetés törlése</button></div>`
+    : '';
+
+  document.getElementById('detail-content').innerHTML = `
+    <div class="detail-gallery">${galleryHTML}</div>
+    <div class="detail-body">
+      <div class="detail-cat">${catIcon(l.category)} ${catLabel(l.category)}</div>
+      <div class="detail-title">${esc(l.title)}</div>
+      <div class="detail-price${!l.price?' free':''}">${fmtPrice(l.price)}</div>
+      <div class="detail-meta-row">
+        ${l.location?`<span class="detail-meta-item">📍 ${esc(l.location)}</span>`:''}
+        <span class="detail-meta-item">⏰ ${timeAgo(l.created_at)}</span>
+        <span class="detail-meta-item">👁 ${l.views} megtekintés</span>
+      </div>
+      ${l.description?`<div class="detail-desc">${esc(l.description)}</div>`:''}
+      <div class="detail-seller">
+        <div class="detail-seller-name">👤 ${esc(l.seller_name)}</div>
+        ${l.seller_phone?`<div class="detail-seller-phone">📞 ${esc(l.seller_phone)}</div>`:''}
+        <div class="detail-seller-joined">Hirdetés feladva: ${new Date(l.created_at).toLocaleDateString('hu-HU')}</div>
+      </div>
+      ${contactSection}
+      ${mineActions}
+    </div>`;
+
+  // store for gallery
+  window._detailImgs = imgs;
+  window._detailListing = l;
+}
+
+function detGallery(dir){
+  const imgs = window._detailImgs || [];
+  if(imgs.length<2) return;
+  detailGalleryIdx = (detailGalleryIdx+dir+imgs.length)%imgs.length;
+  detGalleryGo(detailGalleryIdx);
+}
+function detGalleryGo(i){
+  detailGalleryIdx = i;
+  const imgs = window._detailImgs || [];
+  const imgEl = document.getElementById('det-img');
+  if(imgEl) imgEl.src = imgs[i];
+  document.querySelectorAll('.gallery-dot').forEach((d,idx)=>d.classList.toggle('active',idx===i));
+}
+
+async function sendMessage(listingId){
+  if(!state.user){ toast('Előbb jelentkezz be!','error'); return; }
+  const msg = document.getElementById('msg-text')?.value?.trim();
+  if(!msg||msg.length<5){ toast('Írj legalább 5 karakter üzenetet','error'); return; }
+  try {
+    await api('POST',`/api/listings/${listingId}/message`,{
+      sender_name: state.user.name,
+      sender_email: state.user.email,
+      message: msg
+    });
+    toast('Üzenet elküldve! ✓','success');
+    if(document.getElementById('msg-text')) document.getElementById('msg-text').value='';
+  } catch(e){ toast(e.message,'error'); }
+}
+
+async function deleteListing(id){
+  if(!confirm('Biztosan törlöd a hirdetést?')) return;
+  try {
+    await api('DELETE',`/api/listings/${id}`);
+    toast('Hirdetés törölve','success');
+    closeModal('detail');
+    loadListings();
+  } catch(e){ toast(e.message,'error'); }
+}
+
+// ── NEW LISTING ───────────────────────────────────────────
+function initNewListingForm(){
+  const sel = document.getElementById('nl-cat');
+  sel.innerHTML = '<option value="">Válassz kategóriát...</option>'
+    + CATS.map(c=>`<option value="${c.id}">${c.icon} ${c.label}</option>`).join('');
+}
+
+function setupImageUpload(){
+  state.pendingImages = [];
+  document.getElementById('img-preview-grid').innerHTML='';
+  const input = document.getElementById('nl-images');
+  const dz = document.getElementById('img-dropzone');
+
+  input.onchange = e => addImages([...e.target.files]);
+  dz.ondragover = e => { e.preventDefault(); dz.classList.add('drag-over'); };
+  dz.ondragleave= ()=> dz.classList.remove('drag-over');
+  dz.ondrop = e => {
+    e.preventDefault(); dz.classList.remove('drag-over');
+    addImages([...e.dataTransfer.files].filter(f=>f.type.startsWith('image/')));
+  };
+}
+
+function addImages(files){
+  const remaining = 6 - state.pendingImages.length;
+  files.slice(0,remaining).forEach(f=>{
+    if(f.size > 8*1024*1024){ toast(`${f.name} túl nagy (max 8 MB)`,'error'); return; }
+    state.pendingImages.push(f);
+    const reader = new FileReader();
+    reader.onload = e=>{
+      const idx = state.pendingImages.indexOf(f);
+      const grid = document.getElementById('img-preview-grid');
+      const div = document.createElement('div');
+      div.className='img-preview';
+      div.dataset.idx=idx;
+      div.innerHTML=`<img src="${e.target.result}" alt="preview"><button class="img-preview-remove" onclick="removeImage(${idx})">✕</button>`;
+      grid.appendChild(div);
+    };
+    reader.readAsDataURL(f);
+  });
+  if(files.length>remaining) toast(`Max 6 kép tölthető fel`,'error');
+}
+
+function removeImage(idx){
+  state.pendingImages.splice(idx,1);
+  const grid = document.getElementById('img-preview-grid');
+  grid.innerHTML='';
+  const tmp=[...state.pendingImages];
+  state.pendingImages=[];
+  addImages(tmp);
+}
+
+async function doNewListing(){
+  if(!state.user){ closeModal('new-listing'); openModal('auth'); return; }
+  const title = document.getElementById('nl-title').value.trim();
+  const cat   = document.getElementById('nl-cat').value;
+  const price = document.getElementById('nl-price').value;
+  const loc   = document.getElementById('nl-loc').value.trim();
+  const desc  = document.getElementById('nl-desc').value.trim();
+  const errEl = document.getElementById('nl-error');
+
+  errEl.style.display='none';
+  if(!title){ showErr('nl-error','Add meg a hirdetés címét'); return; }
+  if(!cat)  { showErr('nl-error','Válassz kategóriát'); return; }
+
+  const fd = new FormData();
+  fd.append('title',title);
+  fd.append('category',cat);
+  fd.append('price',price||0);
+  fd.append('location',loc);
+  fd.append('description',desc);
+  state.pendingImages.forEach(f=>fd.append('images',f));
+
+  const btn = document.getElementById('btn-nl-submit');
+  btn.disabled=true; btn.textContent='Feltöltés...';
+
+  try {
+    await api('POST','/api/listings',fd,true);
+    toast('Hirdetés sikeresen feladva! ✓','success');
+    closeModal('new-listing');
+    clearNewListingForm();
+    state.filter.category='';
+    state.page=1;
+    loadListings();
+  } catch(e){ showErr('nl-error',e.message); }
+  btn.disabled=false; btn.textContent='Hirdetés feladása';
+}
+
+function clearNewListingForm(){
+  ['nl-title','nl-price','nl-loc','nl-desc'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  document.getElementById('nl-cat').value='';
+  document.getElementById('nl-error').style.display='none';
+  state.pendingImages=[];
+  document.getElementById('img-preview-grid').innerHTML='';
+}
+
+// ── AUTH ──────────────────────────────────────────────────
+function switchAuthTab(tab){
+  document.getElementById('form-login').style.display    = tab==='login'   ?'block':'none';
+  document.getElementById('form-register').style.display = tab==='register'?'block':'none';
+  document.getElementById('tab-login').classList.toggle('active',tab==='login');
+  document.getElementById('tab-register').classList.toggle('active',tab==='register');
+  document.getElementById('auth-modal-title').textContent = tab==='login'?'Bejelentkezés':'Regisztráció';
+}
+
+async function doLogin(){
+  const email = document.getElementById('login-email').value.trim();
+  const pass  = document.getElementById('login-pass').value;
+  if(!email||!pass){ showErr('login-error','Töltsd ki a mezőket'); return; }
+  const btn=document.getElementById('btn-login');
+  btn.disabled=true; btn.textContent='Belépés...';
+  try {
+    const data = await api('POST','/api/auth/login',{email,password:pass});
+    state.user=data.user; state.token=data.token;
+    localStorage.setItem('vap_token',data.token);
+    updateAuthUI();
+    closeModal('auth');
+    toast(`Üdvözlünk, ${data.user.name}! 👋`,'success');
+  } catch(e){ showErr('login-error',e.message); }
+  btn.disabled=false; btn.textContent='Bejelentkezés';
+}
+
+async function doRegister(){
+  const name  = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const phone = document.getElementById('reg-phone').value.trim();
+  const pass  = document.getElementById('reg-pass').value;
+  const pass2 = document.getElementById('reg-pass2').value;
+  if(!name||!email||!pass){ showErr('reg-error','Töltsd ki a kötelező mezőket'); return; }
+  if(pass!==pass2){ showErr('reg-error','A jelszavak nem egyeznek'); return; }
+  const btn=document.getElementById('btn-register');
+  btn.disabled=true; btn.textContent='Létrehozás...';
+  try {
+    const data = await api('POST','/api/auth/register',{name,email,phone,password:pass});
+    state.user=data.user; state.token=data.token;
+    localStorage.setItem('vap_token',data.token);
+    updateAuthUI();
+    closeModal('auth');
+    toast(`Sikeres regisztráció! Üdvözlünk, ${data.user.name}! 🎉`,'success');
+  } catch(e){ showErr('reg-error',e.message); }
+  btn.disabled=false; btn.textContent='Fiók létrehozása';
+}
+
+function logout(){
+  state.user=null; state.token=null;
+  localStorage.removeItem('vap_token');
+  updateAuthUI();
+  toast('Kijelentkeztél','success');
+  document.getElementById('modal-profile')?.classList.remove('open','visible');
+}
+
+function updateAuthUI(){
+  const el = document.getElementById('auth-ui');
+  if(state.user){
+    const initials = state.user.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    el.innerHTML=`<button class="btn-profile" onclick="openProfile()">
+      <div class="avatar">${initials}</div> ${esc(state.user.name.split(' ')[0])}
+    </button>`;
+  } else {
+    el.innerHTML=`<button class="btn-auth" id="btn-auth" onclick="openModal('auth')">Bejelentkezés</button>`;
+  }
+}
+
+// ── PROFILE ───────────────────────────────────────────────
+async function openProfile(){
+  openModal('profile');
+  document.getElementById('profile-content').innerHTML=`<div style="text-align:center;padding:40px;color:var(--t3)">⏳ Betöltés...</div>`;
+  try {
+    const [me, myListings] = await Promise.all([
+      api('GET','/api/auth/me'),
+      api('GET','/api/listings?mine=1&sort=new')
+    ]);
+    renderProfile(me, myListings.listings);
+  } catch(e){ toast(e.message,'error'); }
+}
+
+function renderProfile(me, listings){
+  const el = document.getElementById('profile-content');
+  el.innerHTML=`
+    <div class="profile-stat-row">
+      <div class="profile-stat">
+        <div class="profile-stat-n">${listings.length}</div>
+        <div class="profile-stat-l">Hirdetésem</div>
+      </div>
+      <div class="profile-stat">
+        <div class="profile-stat-n">${listings.reduce((s,l)=>s+l.views,0)}</div>
+        <div class="profile-stat-l">Összes megtekintés</div>
+      </div>
+    </div>
+    <div class="profile-section">
+      <div class="profile-section-title">Adataim</div>
+      <div class="form-group">
+        <label class="form-label">Név</label>
+        <input class="form-input" id="prof-name" value="${esc(me.name)}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Telefonszám</label>
+        <input class="form-input" id="prof-phone" value="${esc(me.phone||'')}" placeholder="+36 ...">
+      </div>
+      <div style="font-size:.72rem;color:var(--t3);margin-bottom:10px">Email: ${esc(me.email)}</div>
+      <button class="btn-secondary" onclick="saveProfile()">Adatok mentése</button>
+    </div>
+    <div class="profile-section" style="margin-top:20px">
+      <div class="profile-section-title">Hirdetéseim (${listings.length})</div>
+      ${listings.length ? listings.map(l=>`
+        <div class="mini-listing" onclick="openDetail(${l.id})">
+          <div class="mini-listing-img">
+            ${l.images&&l.images.length?`<img src="${l.images[0]}" alt="">`:`<span>${catIcon(l.category)}</span>`}
+          </div>
+          <div class="mini-listing-info">
+            <div class="mini-listing-title">${esc(l.title)}</div>
+            <div class="mini-listing-price">${fmtPriceText(l.price)}</div>
+          </div>
+          <button class="mini-listing-del" onclick="event.stopPropagation();deleteListing(${l.id})">Törlés</button>
+        </div>`).join('') : '<div style="color:var(--t3);font-size:.8rem;padding:16px 0">Még nincs feladott hirdetésed</div>'}
+    </div>
+    <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
+      <button class="btn-secondary" style="border-color:rgba(255,40,40,.25);color:#ff6060" onclick="logout();closeModal('profile')">🚪 Kijelentkezés</button>
+    </div>`;
+}
+
+async function saveProfile(){
+  const name=document.getElementById('prof-name')?.value?.trim();
+  const phone=document.getElementById('prof-phone')?.value?.trim();
+  if(!name||name.length<2){ toast('Érvénytelen név','error'); return; }
+  try {
+    const me=await api('PUT','/api/auth/me',{name,phone});
+    state.user.name=me.name;
+    updateAuthUI();
+    toast('Adatok mentve ✓','success');
+  } catch(e){ toast(e.message,'error'); }
+}
+
+// ── FILTERS ───────────────────────────────────────────────
+function sortChanged(){
+  state.filter.sort = document.getElementById('sort-select').value;
+  state.page=1;
+  loadListings();
+}
+function applyFilters(){
+  state.filter.search = document.getElementById('sidebar-search')?.value?.trim() || '';
+  state.page=1;
+  loadListings();
+}
+function clearFilters(){
+  state.filter = { category:'', search:'', sort:'new' };
+  state.page=1;
+  if(document.getElementById('sidebar-search')) document.getElementById('sidebar-search').value='';
+  if(document.getElementById('search-input'))   document.getElementById('search-input').value='';
+  document.getElementById('sort-select').value='new';
+  renderCatBar();
+  renderSidebarCats();
+  loadListings();
+}
+function goHome(){
+  clearFilters();
+}
+
+// ── SEARCH ────────────────────────────────────────────────
+function doSearch(){
+  const q=document.getElementById('search-input').value.trim();
+  state.filter.search=q;
+  state.filter.category='';
+  state.page=1;
+  renderCatBar();
+  renderSidebarCats();
+  loadListings();
+}
+document.getElementById('search-btn').onclick = doSearch;
+document.getElementById('search-input').addEventListener('keydown',e=>{ if(e.key==='Enter') doSearch(); });
+
+// ── MODALS ────────────────────────────────────────────────
+function openModal(id){
+  const el=document.getElementById('modal-'+id);
+  if(!el) return;
+  if(id==='new-listing'){
+    if(!state.user){ openModal('auth'); return; }
+    setupImageUpload();
+  }
+  el.style.display='flex';
+  requestAnimationFrame(()=>el.classList.add('visible'));
+}
+function closeModal(id){
+  const el=document.getElementById('modal-'+id);
+  if(!el) return;
+  el.classList.remove('visible');
+  setTimeout(()=>{ el.style.display='none'; el.classList.remove('open'); },250);
+}
+function overlayClick(e,id){
+  if(e.target.classList.contains('modal-overlay')) closeModal(id);
+}
+document.querySelectorAll('.modal-overlay').forEach(el=>{
+  el.addEventListener('transitionend',()=>{
+    if(!el.classList.contains('visible')) el.style.display='none';
+  });
+});
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') document.querySelectorAll('.modal-overlay.visible').forEach(el=>{ const id=el.id.replace('modal-',''); closeModal(id); }); });
+
+// ── TOAST ─────────────────────────────────────────────────
+function toast(msg, type='success'){
+  const el=document.createElement('div');
+  el.className=`toast ${type}`;
+  el.innerHTML=`<span class="toast-icon">${type==='success'?'✅':'❌'}</span>${msg}`;
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(()=>{ el.style.animation='toast-out .3s ease both'; setTimeout(()=>el.remove(),300); }, 3500);
+}
+
+// ── UTILS ─────────────────────────────────────────────────
+function showErr(id, msg){
+  const el=document.getElementById(id);
+  if(el){ el.textContent=msg; el.style.display='block'; }
+}
+function esc(s){ return (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ── INIT ─────────────────────────────────────────────────
+document.getElementById('btn-new-listing').onclick = ()=>openModal('new-listing');
+
+async function init(){
+  renderCatBar();
+  renderSidebarCats();
+  initNewListingForm();
+
+  if(state.token){
+    try {
+      const me=await api('GET','/api/auth/me');
+      state.user=me;
+    } catch {
+      state.token=null;
+      localStorage.removeItem('vap_token');
+    }
+  }
+  updateAuthUI();
+  await loadListings();
+}
+init();
+</script>
+</body>
+</html>
