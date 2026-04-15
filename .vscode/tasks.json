@@ -1,0 +1,53 @@
+﻿{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Push",
+      "type": "shell",
+      "command": "git add . ; $d = git diff --cached --quiet ; if ($LASTEXITCODE -ne 0) { $m = 'Mentes_' + (Get-Date -Format 'yyyy.MM.dd_HH.mm') ; git commit -m $m ; git push ; Write-Host 'Kesz!' } else { Write-Host 'Nincs valtozas.' }",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Pull",
+      "type": "shell",
+      "command": "git pull ; Write-Host 'Kesz!'",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "none",
+      "problemMatcher": []
+    },
+    {
+      "label": "Watcher",
+      "type": "shell",
+      "command": "powershell -ExecutionPolicy Bypass -File .vscode/naplo-watcher.ps1",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "none",
+      "isBackground": true,
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "BrowserSync",
+      "type": "shell",
+      "command": "npx browser-sync start --server --files '**/*.css,**/*.html,**/*.js' --port 3000 --open",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "none",
+      "isBackground": true,
+      "problemMatcher": []
+    }
+  ]
+}
