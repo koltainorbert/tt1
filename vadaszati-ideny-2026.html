@@ -314,6 +314,21 @@
       display:block;font-size:.64rem;font-weight:400;
       color:rgba(255,255,255,.35);margin-top:1px;font-style:italic;
     }
+    /* countdown badge */
+    .acd{
+      display:flex;align-items:center;gap:4px;
+      margin-top:4px;font-size:.6rem;font-weight:700;
+      letter-spacing:.03em;line-height:1.2;
+    }
+    .acd-dot{
+      width:7px;height:7px;border-radius:50%;flex-shrink:0;
+    }
+    .acd.on .acd-dot{background:#00ff66;box-shadow:0 0 6px #00ff66;animation:acd-blink .9s ease-in-out infinite;}
+    .acd.off .acd-dot{background:#ff3030;}
+    .acd.on .acd-txt{color:#00ff66;}
+    .acd.off .acd-txt{color:#ff5050;}
+    .acd-lbl{color:rgba(255,255,255,.3);font-weight:400;font-size:.58rem;}
+    @keyframes acd-blink{0%,100%{opacity:1}50%{opacity:.2}}
     .bar-area{flex:1;position:relative;height:38px;}
 
     /* Month gridlines and today line */
