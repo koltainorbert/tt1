@@ -377,19 +377,14 @@
       gap:0;
       font-size:.88rem;
     }
-    /* scanning red line – külön elem, nem ::after, hogy ne vágja le az overflow */
+    /* scroll progress bar */
     .topbar-scan{
-      position:absolute;bottom:0;left:-60%;z-index:1;
-      width:60%;height:2px;
-      background:linear-gradient(90deg,transparent,#ff0000,#ff6600,transparent);
-      animation:tbScan 3.5s ease-in-out infinite;
+      position:absolute;bottom:0;left:0;z-index:1;
+      width:0%;height:2px;
+      background:linear-gradient(90deg,#ff0000,#ff4400,#ff0000);
+      box-shadow:0 0 6px #ff0000,0 0 12px #ff000066;
+      transition:width .1s linear;
       pointer-events:none;
-    }
-    @keyframes tbScan{
-      0%{left:-60%;opacity:0}
-      10%{opacity:1}
-      90%{opacity:1}
-      100%{left:100%;opacity:0}
     }
 
     /* brand */
@@ -991,6 +986,17 @@
 </footer>
 
 <script>
+// ── SCROLL PROGRESS BAR ──────────────────────────────────
+(function(){
+  const bar = document.querySelector('.topbar-scan');
+  if(!bar) return;
+  window.addEventListener('scroll', function(){
+    const scrolled = window.scrollY;
+    const total = document.documentElement.scrollHeight - window.innerHeight;
+    bar.style.width = (total > 0 ? (scrolled / total * 100) : 0) + '%';
+  }, {passive:true});
+})();
+
 // ── BUDAPEST TIMEZONE HELPER ─────────────────────────────
 // Automatikusan kezeli a téli (CET, UTC+1) és nyári (CEST, UTC+2) időszámítást
 function nowBP(){
