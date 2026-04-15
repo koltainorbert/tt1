@@ -1014,7 +1014,10 @@ function renderDetail(l){
        </div>`;
 
   const mineActions = l.isMine
-    ? `<div class="detail-actions"><button class="btn-danger" onclick="deleteListing(${l.id})">🗑️ Hirdetés törlése</button></div>`
+    ? `<div class="detail-actions">
+         <button class="btn-secondary" style="flex:1;width:auto" onclick="openEditListing(${l.id})">✏️ Szerkesztés</button>
+         <button class="btn-danger" onclick="deleteListing(${l.id})">🗑️ Törlés</button>
+       </div>`
     : '';
 
   document.getElementById('detail-content').innerHTML = `
@@ -1080,6 +1083,64 @@ async function deleteListing(id){
     closeModal('detail');
     loadListings();
   } catch(e){ toast(e.message,'error'); }
+}
+
+function openEditListing(id){
+  const l = window._detailListing;
+  if(!l || l.id !== id) return;
+  // Reuse the new-listing modal in edit mode
+  state._editId = id;
+  setupImageUpload();
+  // Pre-fill form
+  document.querySelector('#modal-new-listing .modal-title').textContent = 'Hirdetés szerkesztése';
+  document.getElementById('btn-nl-submit').textContent = 'Módosítások mentése';
+  document.getElementById('btn-nl-submit').onclick = doEditListing;
+  document.getElementById('nl-title').value = l.title || '';
+  document.getElementById('nl-cat').value   = l.category || '';
+  document.getElementById('nl-price').value = l.price || '';
+  document.getElementById('nl-loc').value   = l.location || '';
+  document.getElementById('nl-desc').value  = l.description || '';
+  // Show existing images as preview (read-only placeholders)
+  const grid = document.getElementById('img-preview-grid');
+  if(l.images && l.images.length){
+    grid.innerHTML = l.images.map((src,i)=>`
+      <div class="img-preview">
+        <img src="${src}" alt="kép ${i+1}">
+        <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.5);font-size:.55rem;padding:2px 4px;text-align:center;color:rgba(255,255,255,.6)">meglévő</div>
+      </div>`).join('');
+  }
+  openModal('new-listing');
+}
+
+async function doEditListing(){
+  const id    = state._editId;
+  const title = document.getElementById('nl-title').value.trim();
+  const cat   = document.getElementById('nl-cat').value;
+  const price = document.getElementById('nl-price').value;
+  const loc   = document.getElementById('nl-loc').value.trim();
+  const desc  = document.getElementById('nl-desc').value.trim();
+  if(!title){ showErr('nl-error','Add meg a hirdetés címét'); return; }
+  if(!cat)  { showErr('nl-error','Válassz kategóriát'); return; }
+  const btn = document.getElementById('btn-nl-submit');
+  btn.disabled=true; btn.textContent='Mentés...';
+  try {
+    await api('PUT',`/api/listings/${id}`,{ title, category:cat, price:price||0, location:loc, description:desc });
+    toast('Hirdetés sikeresen módosítva! ✓','success');
+    closeModal('new-listing');
+    resetNewListingModal();
+    loadListings();
+    // Re-open detail with updated data
+    setTimeout(()=>openDetail(id), 400);
+  } catch(e){ showErr('nl-error',e.message); }
+  btn.disabled=false; btn.textContent='Módosítások mentése';
+}
+
+function resetNewListingModal(){
+  state._editId = null;
+  document.querySelector('#modal-new-listing .modal-title').textContent = 'Hirdetés feladása';
+  document.getElementById('btn-nl-submit').textContent = 'Hirdetés feladása';
+  document.getElementById('btn-nl-submit').onclick = doNewListing;
+  clearNewListingForm();
 }
 
 // ── NEW LISTING ───────────────────────────────────────────
@@ -1370,6 +1431,7 @@ function closeModal(id){
   if(!el) return;
   el.classList.remove('visible');
   setTimeout(()=>{ el.style.display='none'; el.classList.remove('open'); },250);
+  if(id==='new-listing' && state._editId) resetNewListingModal();
 }
 function overlayClick(e,id){
   if(e.target.classList.contains('modal-overlay')) closeModal(id);
