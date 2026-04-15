@@ -746,6 +746,60 @@
       text-shadow:0 0 8px rgba(255,150,0,.5);
     }
 
+    /* ── OPENING DAY POPUP ── */
+    #open-popup{
+      position:fixed;inset:0;z-index:8000;
+      display:flex;align-items:center;justify-content:center;
+      background:rgba(0,0,0,.75);backdrop-filter:blur(6px);
+      opacity:0;pointer-events:none;
+      transition:opacity .35s;
+    }
+    #open-popup.show{opacity:1;pointer-events:all;}
+    .op-box{
+      background:linear-gradient(160deg,rgb(8,18,8) 0%,rgb(6,6,6) 100%);
+      border:1px solid rgba(0,220,80,.35);
+      border-radius:14px;
+      padding:36px 44px 32px;
+      text-align:center;
+      max-width:520px;width:90%;
+      box-shadow:0 0 60px rgba(0,200,60,.2),0 0 120px rgba(0,0,0,.8);
+      animation:op-in .4s cubic-bezier(.22,1,.36,1) both;
+    }
+    @keyframes op-in{from{transform:scale(.88) translateY(20px);opacity:0}to{transform:none;opacity:1}}
+    .op-icon{font-size:3rem;margin-bottom:10px;display:block;}
+    .op-title{
+      font-size:1rem;font-weight:700;letter-spacing:.12em;
+      text-transform:uppercase;color:rgba(255,255,255,.45);
+      margin-bottom:6px;
+    }
+    .op-count{
+      font-size:4rem;font-weight:900;color:#4dff88;
+      text-shadow:0 0 30px rgba(0,220,80,.6),0 0 60px rgba(0,200,60,.3);
+      line-height:1.1;margin-bottom:4px;
+    }
+    .op-sub{
+      font-size:1.05rem;color:rgba(255,255,255,.7);
+      margin-bottom:22px;
+    }
+    .op-list{
+      display:flex;flex-wrap:wrap;gap:6px;justify-content:center;
+      margin-bottom:24px;
+    }
+    .op-item{
+      background:rgba(0,200,60,.12);border:1px solid rgba(0,200,60,.25);
+      border-radius:20px;padding:4px 12px;
+      font-size:.72rem;font-weight:600;color:#4dff88;
+      letter-spacing:.04em;
+    }
+    .op-close{
+      background:rgba(0,200,60,.15);border:1px solid rgba(0,200,60,.4);
+      color:#4dff88;font-size:.85rem;font-weight:700;
+      padding:10px 28px;border-radius:8px;cursor:pointer;
+      letter-spacing:.08em;text-transform:uppercase;
+      transition:all .15s;
+    }
+    .op-close:hover{background:rgba(0,200,60,.3);box-shadow:0 0 16px rgba(0,200,60,.3);}
+
     /* ── INTRO ── */
     #intro{
       position:fixed;inset:0;z-index:9999;
@@ -936,6 +990,18 @@
   intro.addEventListener('touchend', function(e){ e.preventDefault(); exit(); }, {passive:false});
 })();
 </script>
+
+<!-- OPENING DAY POPUP -->
+<div id="open-popup">
+  <div class="op-box">
+    <span class="op-icon">🌿</span>
+    <div class="op-title">Ma megnyílt &mdash; <span id="op-date"></span></div>
+    <div class="op-count" id="op-count"></div>
+    <div class="op-sub">új vadfaj vadászható ma</div>
+    <div class="op-list" id="op-list"></div>
+    <button class="op-close" onclick="document.getElementById('open-popup').classList.remove('show')">Rendben, hajrá! 🏹</button>
+  </div>
+</div>
 
 <!-- TOPBAR -->
 <div class="topbar">
@@ -1455,6 +1521,23 @@ function buildTodayPanel(){
     panel.appendChild(grid2);
   }
   updateTPCountdowns();
+
+  // Opening day popup
+  const newToday = open.filter(a => a.isNew);
+  if(newToday.length > 0){
+    const bp2 = nowBP();
+    const MFH2=['január','február','március','április','május','június','július','augusztus','szeptember','október','november','december'];
+    document.getElementById('op-date').textContent = `${bp2.year}. ${MFH2[bp2.month-1]} ${bp2.day}.`;
+    document.getElementById('op-count').textContent = newToday.length;
+    const list = document.getElementById('op-list');
+    newToday.forEach(a => {
+      const el = document.createElement('div');
+      el.className = 'op-item';
+      el.textContent = a.name;
+      list.appendChild(el);
+    });
+    setTimeout(() => document.getElementById('open-popup').classList.add('show'), 1200);
+  }
 }
 buildTodayPanel();
 
