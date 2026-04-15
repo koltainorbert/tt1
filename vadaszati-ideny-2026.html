@@ -728,6 +728,11 @@
     .b-new{background:rgba(255,255,255,.1);color:#fff}
     .b-soon{background:rgba(255,255,255,.06);color:rgba(255,255,255,.45)}
     .tp-empty{font-size:.78rem;color:rgba(255,255,255,.28);padding:12px 0}
+    .tp-cd{
+      font-size:.65rem;font-weight:700;color:#ff9900;
+      margin-top:5px;letter-spacing:.04em;
+      text-shadow:0 0 8px rgba(255,150,0,.5);
+    }
 
     /* ── INTRO ── */
     #intro{
@@ -1319,7 +1324,7 @@ function buildTodayPanel(){
             open.push({name:a.name,sub:a.sub||'',color:g.color,
               daysLeft:e-todayDoy,isNew:todayDoy===s,
               range:`${MF[ms-1]} ${ds}. – ${MF[me-1]} ${de}.`,
-              closing:`${MF[me-1]} ${de}.`});
+              closing:`${MF[me-1]} ${de}.`,closeM:me,closeD:de});
             seen.add(a.name);found=true;break;
           }
           if(!found&&s>todayDoy&&s-todayDoy<=14){
@@ -1334,7 +1339,7 @@ function buildTodayPanel(){
             open.push({name:a.name,sub:a.sub||'',color:g.color,
               daysLeft:e1-todayDoy,isNew:false,
               range:`Jan 1. – ${MF[me-1]} ${de}.`,
-              closing:`${MF[me-1]} ${de}.`});
+              closing:`${MF[me-1]} ${de}.`,closeM:me,closeD:de});
             seen.add(a.name);found=true;break;
           }
           const s2=doy(ms,ds);
@@ -1342,7 +1347,7 @@ function buildTodayPanel(){
             open.push({name:a.name,sub:a.sub||'',color:g.color,
               daysLeft:TOTAL-1-todayDoy,isNew:todayDoy===s2,
               range:`${MF[ms-1]} ${ds}. – Dec 31.`,
-              closing:'December 31.'});
+              closing:'December 31.',closeM:12,closeD:31});
             seen.add(a.name);found=true;break;
           }
           if(!found&&s2>todayDoy&&s2-todayDoy<=14){
@@ -1381,6 +1386,14 @@ function buildTodayPanel(){
   setInterval(updateTPLive,30000);
 
   // Open section
+  const _tpCdList=[];
+  function updateTPCountdowns(){
+    for(const {el,closeM,closeD} of _tpCdList){
+      const ms=msTillBPDate(closeM,closeD);
+      el.textContent='⏱ '+fmtMs(ms)+' van hátra';
+    }
+  }
+  setInterval(updateTPCountdowns,1000);
   const lbl=document.createElement('div');
   lbl.className='tp-section-lbl';
   lbl.textContent='Jelenleg nyitott idény';
@@ -1399,7 +1412,9 @@ function buildTodayPanel(){
       const card=document.createElement('div');
       card.className='tp-card';
       card.style.borderLeftColor=a.color;
-      card.innerHTML=`<div class="tp-card-name">${a.name}</div><div class="tp-card-sub">${a.sub}</div><div class="tp-card-range">${a.range}</div><span class="tp-badge ${bc}">${bt}</span>`;
+      card.innerHTML=`<div class="tp-card-name">${a.name}</div><div class="tp-card-sub">${a.sub}</div><div class="tp-card-range">${a.range}</div><span class="tp-badge ${bc}">${bt}</span><div class="tp-cd"></div>`;
+      const cdEl=card.querySelector('.tp-cd');
+      _tpCdList.push({el:cdEl,closeM:a.closeM,closeD:a.closeD});
       grid.appendChild(card);
     }
     panel.appendChild(grid);
