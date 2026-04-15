@@ -152,13 +152,186 @@
 
     .group-body.hidden{display:none}
 
+    /* ── TOPBAR CLOCK ── */
+    .topbar{
+      position:fixed;top:0;left:0;right:0;z-index:200;
+      background:rgba(6,6,6,.95);
+      border-bottom:1px solid rgba(255,0,0,.25);
+      backdrop-filter:blur(8px);
+      display:flex;align-items:center;justify-content:space-between;
+      padding:6px 18px;
+      font-size:.72rem;
+    }
+    .topbar-brand{
+      color:#ff0000;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+      font-size:.75rem;
+    }
+    .topbar-clock{
+      color:#fff;font-weight:600;letter-spacing:.08em;
+      font-variant-numeric:tabular-nums;
+    }
+    .topbar-clock .date-part{color:rgba(255,255,255,.5);font-weight:400;margin-right:10px;}
+    .topbar-links{display:flex;gap:14px;}
+    .topbar-links a{
+      color:rgba(255,255,255,.45);font-size:.68rem;
+      text-decoration:none;letter-spacing:.04em;
+      transition:color .15s;
+    }
+    .topbar-links a:hover{color:#ff0000}
+
+    body{padding-top:70px}
+
+    /* ── MODAL ── */
+    .modal-overlay{
+      display:none;position:fixed;inset:0;z-index:500;
+      background:rgba(0,0,0,.82);backdrop-filter:blur(4px);
+      align-items:center;justify-content:center;
+    }
+    .modal-overlay.open{display:flex}
+    .modal-box{
+      background:rgb(14,14,14);
+      border:1px solid rgba(255,0,0,.25);
+      border-radius:12px;
+      max-width:680px;width:calc(100% - 32px);
+      max-height:85vh;overflow-y:auto;
+      padding:28px 28px 24px;
+      position:relative;
+    }
+    .modal-box h2{
+      color:#ff0000;font-size:1rem;letter-spacing:.1em;
+      text-transform:uppercase;margin-bottom:18px;
+      border-bottom:1px solid rgba(255,0,0,.2);padding-bottom:10px;
+    }
+    .modal-box h3{
+      color:#fff;font-size:.8rem;letter-spacing:.07em;
+      text-transform:uppercase;margin:18px 0 8px;
+      color:rgba(255,255,255,.7);
+    }
+    .modal-box p,.modal-box li{
+      font-size:.78rem;color:rgba(255,255,255,.6);
+      line-height:1.7;margin-bottom:4px;
+    }
+    .modal-box a{color:#ff0000;text-decoration:none}
+    .modal-box a:hover{text-decoration:underline}
+    .modal-box .close-btn{
+      position:absolute;top:14px;right:16px;
+      background:none;border:none;color:rgba(255,255,255,.4);
+      font-size:1.4rem;cursor:pointer;line-height:1;
+      transition:color .15s;
+    }
+    .modal-box .close-btn:hover{color:#ff0000}
+    .modal-box .section-sep{
+      border:none;border-top:1px solid rgba(255,255,255,.07);
+      margin:16px 0;
+    }
+    .info-grid{
+      display:grid;grid-template-columns:auto 1fr;
+      gap:4px 12px;font-size:.76rem;
+    }
+    .info-grid dt{color:rgba(255,255,255,.4);white-space:nowrap}
+    .info-grid dd{color:rgba(255,255,255,.75)}
+
+    /* ── FOOTER ── */
     footer{
       text-align:center;margin-top:28px;
       font-size:.7rem;color:rgba(255,255,255,.22);letter-spacing:.04em;
     }
+    footer a{color:rgba(255,0,0,.45);text-decoration:none;transition:color .15s}
+    footer a:hover{color:#ff0000}
   </style>
 </head>
 <body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-brand">&#127806; Vadászati Portál 2026</div>
+  <div class="topbar-clock">
+    <span class="date-part" id="clk-date"></span>
+    <span id="clk-time"></span>
+  </div>
+  <div class="topbar-links">
+    <a href="https://www.vabi.hu" target="_blank">vabi.hu</a>
+    <a href="https://www.infostudio.hu" target="_blank">infostudio.hu</a>
+    <a href="#" onclick="openModal('impresszum');return false;">Impresszum</a>
+    <a href="#" onclick="openModal('adatvedelem');return false;">Adatvédelem</a>
+    <a href="#" onclick="openModal('licence');return false;">Licenc</a>
+  </div>
+</div>
+
+<!-- IMPRESSZUM MODAL -->
+<div class="modal-overlay" id="modal-impresszum">
+  <div class="modal-box">
+    <button class="close-btn" onclick="closeModal('impresszum')">&times;</button>
+    <h2>Impresszum</h2>
+
+    <h3>Weboldal fejlesztő &amp; üzemeltető</h3>
+    <dl class="info-grid">
+      <dt>Cégnév:</dt><dd>Légman Péter Smart Device Hungary Kft.</dd>
+      <dt>Székhely:</dt><dd>8200 Veszprém, Haszkovo u. 37/C</dd>
+      <dt>Adószám:</dt><dd>26234524-2-19</dd>
+      <dt>Cégjegyzékszám:</dt><dd>19-09-519585</dd>
+      <dt>Telefon:</dt><dd>+36 30 400 4636</dd>
+      <dt>E-mail:</dt><dd><a href="mailto:infostudiohungary@gmail.com">infostudiohungary@gmail.com</a></dd>
+      <dt>Weboldal:</dt><dd><a href="https://www.infostudio.hu" target="_blank">www.infostudio.hu</a></dd>
+    </dl>
+
+    <hr class="section-sep"/>
+
+    <h3>Tárhelyszolgáltató</h3>
+    <dl class="info-grid">
+      <dt>Cégnév:</dt><dd>Nethely Kft.</dd>
+      <dt>Székhely:</dt><dd>1115 Budapest, Halmi utca 29.</dd>
+      <dt>Cégjegyzékszám:</dt><dd>01-09-961790</dd>
+      <dt>Adószám:</dt><dd>23358005-2-43</dd>
+      <dt>Telefon:</dt><dd>+36 1 445 2040</dd>
+      <dt>E-mail:</dt><dd><a href="mailto:info@nethely.hu">info@nethely.hu</a></dd>
+      <dt>Weboldal:</dt><dd><a href="https://www.nethely.hu" target="_blank">www.nethely.hu</a></dd>
+    </dl>
+
+    <hr class="section-sep"/>
+
+    <h3>Vadászati adatok forrása</h3>
+    <p>79/2004. (V.4.) FVM rendelet a vadászható állatfajokról, vadászati idényekről és vadászati tilalmi időkről, valamint módosításai.</p>
+    <p>Kapcsolódó portál: <a href="https://www.vabi.hu" target="_blank">www.vabi.hu</a> (Vadászok és Barátaik)</p>
+  </div>
+</div>
+
+<!-- ADATVÉDELEM MODAL -->
+<div class="modal-overlay" id="modal-adatvedelem">
+  <div class="modal-box">
+    <button class="close-btn" onclick="closeModal('adatvedelem')">&times;</button>
+    <h2>Adatvédelmi tájékoztató</h2>
+    <p>Ez az oldal kizárólag statikus HTML tartalmat jelenít meg. Személyes adatot nem gyűjt, nem tárol, nem továbbít.</p>
+    <p>Nem használ sütit (cookie), nyomkövetőt, analitikát, hirdetési rendszert.</p>
+    <hr class="section-sep"/>
+    <h3>Fejlesztő adatkezelési tájékoztatója</h3>
+    <p><a href="https://infostudio.hu/adatkezelesi-tajekoztato/" target="_blank">infostudio.hu/adatkezelesi-tajekoztato/</a></p>
+    <h3>Fejlesztő sütitájékoztatója</h3>
+    <p><a href="https://infostudio.hu/sutik/" target="_blank">infostudio.hu/sutik/</a></p>
+    <h3>vabi.hu adatvédelmi oldal</h3>
+    <p><a href="https://www.vabi.hu" target="_blank">www.vabi.hu</a></p>
+  </div>
+</div>
+
+<!-- LICENC MODAL -->
+<div class="modal-overlay" id="modal-licence">
+  <div class="modal-box">
+    <button class="close-btn" onclick="closeModal('licence')">&times;</button>
+    <h2>Licenc &amp; jogi nyilatkozat</h2>
+    <p>&copy; 2026 Légman Péter Smart Device Hungary Kft. &mdash; <a href="https://www.infostudio.hu" target="_blank">InfoStudio</a>. Minden jog fenntartva.</p>
+    <hr class="section-sep"/>
+    <h3>Felhasználási feltételek</h3>
+    <p>Az oldal tartalma kizárólag tájékoztatási célt szolgál. A vadászati idényeket a mindenkori hatályos jogszabályok alapján kell értelmezni.</p>
+    <p>Az adatok pontosságáért felelősséget nem vállalunk. Mindig ellenőrizd a hatályos rendeletet a vadászat megkezdése előtt.</p>
+    <hr class="section-sep"/>
+    <h3>Jogszabályi alap</h3>
+    <p>79/2004. (V.4.) FVM rendelet és módosításai (Magyar Közlöny)</p>
+    <p>2021. évi XLVI. törvény a vadászatról</p>
+    <hr class="section-sep"/>
+    <h3>Kapcsolódó oldalak</h3>
+    <p><a href="https://www.vabi.hu" target="_blank">vabi.hu</a> &nbsp;|&nbsp; <a href="https://www.infostudio.hu" target="_blank">infostudio.hu</a></p>
+  </div>
+</div>
 
 <h1>Vadászati idények <span>2026</span></h1>
 <p class="subtitle">Magyar vadászati naptár &nbsp;·&nbsp; január 1. – december 31. &nbsp;·&nbsp; <span style="color:#ff0000;font-weight:700">|</span> = ápr. 15. (ma) &nbsp;·&nbsp; Csoportokra kattintva össze/kibontható</p>
@@ -178,10 +351,46 @@
 <div class="chart" id="chart"></div>
 
 <footer>
-  Forrás: 79/2004. (V.4.) FVM rendelet és módosításai &nbsp;|&nbsp; Nem helyettesíti a hatályos jogszabályokat.
+  &copy; 2026 <a href="https://www.infostudio.hu" target="_blank">InfoStudio</a>
+  &nbsp;&mdash;&nbsp;
+  <a href="#" onclick="openModal('impresszum');return false;">Impresszum</a>
+  &nbsp;|&nbsp;
+  <a href="#" onclick="openModal('adatvedelem');return false;">Adatvédelem</a>
+  &nbsp;|&nbsp;
+  <a href="#" onclick="openModal('licence');return false;">Licenc</a>
+  &nbsp;|&nbsp;
+  <a href="https://www.vabi.hu" target="_blank">vabi.hu</a>
+  &nbsp;&mdash;&nbsp;
+  Forrás: 79/2004. (V.4.) FVM rendelet &nbsp;|&nbsp; Nem helyettesíti a hatályos jogszabályokat.
 </footer>
 
 <script>
+// ── LIVE CLOCK ──────────────────────────────────────────────
+(function tick(){
+  const n=new Date();
+  const days=['vasárnap','hétfő','kedd','szerda','csütörtök','péntek','szombat'];
+  const months=['január','február','március','április','május','június','július','augusztus','szeptember','október','november','december'];
+  const dateStr=`${n.getFullYear()}. ${months[n.getMonth()]} ${n.getDate()}. &ndash; ${days[n.getDay()]}`;
+  const timeStr=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0');
+  document.getElementById('clk-date').innerHTML=dateStr;
+  document.getElementById('clk-time').textContent=timeStr;
+  setTimeout(tick,1000);
+})();
+
+// ── MODAL HELPERS ──────────────────────────────────────────
+function openModal(id){
+  document.getElementById('modal-'+id).classList.add('open');
+}
+function closeModal(id){
+  document.getElementById('modal-'+id).classList.remove('open');
+}
+document.querySelectorAll('.modal-overlay').forEach(el=>{
+  el.addEventListener('click',e=>{ if(e.target===el) el.classList.remove('open'); });
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape') document.querySelectorAll('.modal-overlay.open').forEach(el=>el.classList.remove('open'));
+});
+
 const YEAR = 2026;
 function isLeap(y){return(y%4===0&&y%100!==0)||(y%400===0)}
 const MD=[31,isLeap(YEAR)?29:28,31,30,31,30,31,31,30,31,30,31];
