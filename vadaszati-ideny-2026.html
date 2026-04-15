@@ -203,13 +203,27 @@
       .topbar-menu{
         display:none;flex-direction:column;
         position:fixed;top:48px;left:0;right:0;
-        background:rgba(6,6,6,.98);
-        border-bottom:1px solid rgba(255,0,0,.25);
-        padding:12px 18px 16px;
-        gap:12px;z-index:199;
+        background:rgb(6,6,6);
+        background-image:radial-gradient(circle,rgba(255,255,255,.07) 1px,transparent 1px);
+        background-size:24px 24px;
+        border-top:1px solid rgba(255,0,0,.35);
+        border-bottom:2px solid rgba(255,0,0,.35);
+        padding:16px 20px 20px;
+        gap:0;z-index:199;
+        box-shadow:0 8px 32px rgba(0,0,0,.8);
       }
       .topbar-menu.open{display:flex;}
-      .topbar-menu a{font-size:.82rem;padding:4px 0;}
+      .topbar-menu a{
+        font-size:.9rem;font-weight:600;
+        color:#fff;letter-spacing:.06em;
+        padding:12px 0;
+        border-bottom:1px solid rgba(255,255,255,.06);
+        display:flex;align-items:center;gap:8px;
+        text-decoration:none;
+        transition:color .15s,padding-left .15s;
+      }
+      .topbar-menu a:hover{color:#ff0000;padding-left:6px;}
+      .topbar-menu a:last-child{border-bottom:none;}
       .chart-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
       .chart{min-width:600px;}
       .mh-name,.animal-name,.group-label{width:110px;min-width:110px;font-size:.62rem;padding:5px 7px;}
