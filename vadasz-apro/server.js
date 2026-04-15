@@ -171,6 +171,22 @@ app.post('/api/listings', auth, upload.array('images',6), (req, res) => {
   res.status(201).json(fmtListing(listing, req.user));
 });
 
+app.put('/api/listings/:id', auth, (req, res) => {
+  const { title, description, price, category, location } = req.body||{};
+  if (!title||!title.trim()) return res.status(400).json({ error: 'A cím kötelező' });
+  if (!category||!category.trim()) return res.status(400).json({ error: 'A kategória kötelező' });
+  const db = readDB();
+  const l  = db.listings.find(l => l.id===parseInt(req.params.id) && l.user_id===req.user.id);
+  if (!l) return res.status(404).json({ error: 'Hirdetés nem található' });
+  l.title       = title.trim().slice(0,120);
+  l.description = (description||'').trim().slice(0,5000);
+  l.price       = Math.max(0, parseInt(price)||0);
+  l.category    = category.trim();
+  l.location    = (location||'').trim().slice(0,80);
+  writeDB(db);
+  res.json({ ok:true });
+});
+
 app.delete('/api/listings/:id', auth, (req, res) => {
   const db = readDB();
   const l  = db.listings.find(l => l.id===parseInt(req.params.id) && l.user_id===req.user.id);
