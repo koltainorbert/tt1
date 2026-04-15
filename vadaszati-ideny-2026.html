@@ -179,7 +179,52 @@
     }
     .topbar-links a:hover{color:#ff0000}
 
-    body{padding-top:70px}
+    body{padding-top:50px}
+
+    /* ── HAMBURGER ── */
+    .topbar-ham{
+      display:none;
+      background:none;border:none;color:#fff;
+      font-size:1.4rem;cursor:pointer;padding:2px 4px;
+      line-height:1;
+    }
+    .topbar-menu{
+      display:flex;gap:14px;
+    }
+    @media(max-width:700px){
+      body{padding-top:48px;padding-left:10px;padding-right:10px;}
+      h1{font-size:1.3rem;}
+      .subtitle{font-size:.72rem;}
+      .topbar{padding:8px 12px;flex-wrap:wrap;gap:4px;}
+      .topbar-brand{font-size:.68rem;}
+      .topbar-clock{font-size:.68rem;}
+      .topbar-clock .date-part{display:none;}
+      .topbar-ham{display:block;}
+      .topbar-menu{
+        display:none;flex-direction:column;
+        position:fixed;top:48px;left:0;right:0;
+        background:rgba(6,6,6,.98);
+        border-bottom:1px solid rgba(255,0,0,.25);
+        padding:12px 18px 16px;
+        gap:12px;z-index:199;
+      }
+      .topbar-menu.open{display:flex;}
+      .topbar-menu a{font-size:.82rem;padding:4px 0;}
+      .chart-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+      .chart{min-width:600px;}
+      .mh-name,.animal-name,.group-label{width:110px;min-width:110px;font-size:.62rem;padding:5px 7px;}
+      .mh-month{font-size:.55rem;padding:6px 0;}
+      .legend{gap:5px 12px;margin-bottom:16px;}
+      .leg{font-size:.68rem;}
+      .tp-grid{grid-template-columns:1fr 1fr;gap:6px;}
+      .tp-card-name{font-size:.72rem;}
+      .today-panel{margin-bottom:16px;}
+      .tp-title{font-size:.85rem;}
+    }
+    @media(max-width:400px){
+      .tp-grid{grid-template-columns:1fr;}
+      .mh-name,.animal-name,.group-label{width:90px;min-width:90px;font-size:.58rem;}
+    }
 
     /* ── MODAL ── */
     .modal-overlay{
@@ -298,14 +343,15 @@
     <span class="date-part" id="clk-date"></span>
     <span id="clk-time"></span>
   </div>
-  <div class="topbar-links">
+  <button class="topbar-ham" id="ham-btn" aria-label="Menü">&#9776;</button>
+  <nav class="topbar-menu" id="topbar-menu">
     <a href="https://www.facebook.com/search/groups/?q=vadk%C3%A1r+%C3%A9jszakai+lesv%C3%A1d%C3%A1szat" target="_blank" title="Vadkár éjszakai lesvadászat – Facebook csoport">&#128101; FB Csoport</a>
     <a href="https://www.vabi.hu" target="_blank">vabi.hu</a>
     <a href="https://www.infostudio.hu" target="_blank">infostudio.hu</a>
-    <a href="#" onclick="openModal('impresszum');return false;">Impresszum</a>
-    <a href="#" onclick="openModal('adatvedelem');return false;">Adatvédelem</a>
-    <a href="#" onclick="openModal('licence');return false;">Licenc</a>
-  </div>
+    <a href="#" onclick="openModal('impresszum');closeMenu();return false;">Impresszum</a>
+    <a href="#" onclick="openModal('adatvedelem');closeMenu();return false;">Adatvédelem</a>
+    <a href="#" onclick="openModal('licence');closeMenu();return false;">Licenc</a>
+  </nav>
 </div>
 
 <!-- IMPRESSZUM MODAL -->
@@ -407,7 +453,9 @@
 
 <div id="today-panel" class="today-panel"></div>
 
-<div class="chart" id="chart"></div>
+<div class="chart-scroll">
+  <div class="chart" id="chart"></div>
+</div>
 
 <footer>
   &copy; 2026 <a href="https://www.infostudio.hu" target="_blank">InfoStudio</a>
@@ -448,6 +496,15 @@ document.querySelectorAll('.modal-overlay').forEach(el=>{
 });
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape') document.querySelectorAll('.modal-overlay.open').forEach(el=>el.classList.remove('open'));
+});
+
+// ── HAMBURGER ──────────────────────────────────────────────
+function closeMenu(){document.getElementById('topbar-menu').classList.remove('open');}
+document.getElementById('ham-btn').addEventListener('click',()=>{
+  document.getElementById('topbar-menu').classList.toggle('open');
+});
+document.addEventListener('click',e=>{
+  if(!e.target.closest('#topbar-menu')&&!e.target.closest('#ham-btn'))closeMenu();
 });
 
 const YEAR = 2026;
