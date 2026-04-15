@@ -17,6 +17,25 @@
       "created_at": "2026-04-15 15:39:50"
     }
   ],
-  "listings": [],
+  "listings": [
+    {
+      "id": 1,
+      "user_id": 2,
+      "title": "Test Golyoós Puska",
+      "description": "szp cucc bnagyon",
+      "price": 20000,
+      "category": "ejjellato",
+      "location": "Veszprém",
+      "images": [
+        "/uploads/1776267684832-iv7tlm79ga.jpg",
+        "/uploads/1776267684953-fmvk5kyxg2v.jpg",
+        "/uploads/1776267684998-avwdz980h6m.jpg",
+        "/uploads/1776267685052-0h134apcrvoo.jpg"
+      ],
+      "status": "active",
+      "views": 0,
+      "created_at": "2026-04-15 15:41:25"
+    }
+  ],
   "messages": []
 }
