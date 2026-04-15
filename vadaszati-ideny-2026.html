@@ -353,7 +353,7 @@
       position:fixed;inset:0;z-index:9999;
       background-color:#000;
       background-image:url('671303117_10236971218234012_2276220733352520771_n.jpg');
-      background-size:cover;
+      background-size:contain;
       background-position:center center;
       background-repeat:no-repeat;
       overflow:hidden;
@@ -384,7 +384,7 @@
     /* muzzle flash */
     #gun-flash{
       position:absolute;inset:0;z-index:15;
-      background:radial-gradient(ellipse at 50% 42%, #fff 0%, #ffe066 30%, transparent 70%);
+      background:radial-gradient(ellipse at 50% 50%, #fff 0%, #ffe066 30%, transparent 70%);
       opacity:0;
       pointer-events:none;
       transition:opacity .06s;
@@ -505,7 +505,7 @@
 
     // 2) Draw cracks after short delay (bullet travels)
     setTimeout(()=>{
-      const cx=cc.width*.5, cy=cc.height*.42;
+      const cx=cc.width*.5, cy=cc.height*.5;
       drawCracks(cx,cy);
     }, 180);
 
