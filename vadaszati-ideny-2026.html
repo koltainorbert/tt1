@@ -1425,6 +1425,125 @@ for(const g of groups){
     gl.classList.toggle('collapsed',h);
   });
 }
+
+// ── HOLDNAPTÁR ────────────────────────────────────────────
+(function(){
+  // Ismert újhold: 2000. jan. 6. 18:14 UTC → Unix ms
+  const KNOWN_NEW = Date.UTC(2000,0,6,18,14,0);
+  const SYNODIC = 29.53058867 * 24 * 3600 * 1000; // ms
+
+  function moonPhase(date){
+    const elapsed = date.getTime() - KNOWN_NEW;
+    let frac = ((elapsed % SYNODIC) + SYNODIC) % SYNODIC / SYNODIC; // 0..1
+    return frac;
+  }
+
+  function phaseIcon(f){
+    // 8 fázis egyenletesen
+    const i = Math.round(f * 8) % 8;
+    return ['🌑','🌒','🌓','🌔','🌕','🌖','🌗','🌘'][i];
+  }
+
+  function phaseName(f){
+    const i = Math.round(f * 8) % 8;
+    return ['Újhold','Növekvő sarló','Első negyed','Növekvő domború','Telihold','Fogyó domború','Utolsó negyed','Fogyó sarló'][i];
+  }
+
+  function illumination(f){
+    // 0=újhold, 0.5=telihold, cos formula
+    return Math.round((1 - Math.cos(f * 2 * Math.PI)) / 2 * 100);
+  }
+
+  function huntTip(f){
+    const pct = illumination(f);
+    if(f < 0.03 || f > 0.97)
+      return '🌑 <b>Újhold körül:</b> Az állatok nappal aktívabbak — kiváló nappali vadászat. A sötét éjszaka a nagyobb vadvadak mozgását erősen csökkenti éjjel.';
+    if(f < 0.22)
+      return '🌒 <b>Növekvő sarló:</b> Hajnali és délelőtti órákban fokozott aktivitás. Jó reggelizős lesben.';
+    if(f < 0.28)
+      return '🌓 <b>Első negyed:</b> Vegyes aktivitás — délelőtt és kora este egyformán eredményes lehet.';
+    if(f < 0.47)
+      return '🌔 <b>Növekvő domború:</b> Az esti aktivitás növekszik — alkalmas esti lesekhez cserkészéshez.';
+    if(f < 0.53)
+      return '🌕 <b>Telihold körül (' + pct + '%):</b> Az állatok éjjel aktívak, nappal pihennek — nehezebb nappal. Éjszakai les (ha engedélyezett) ideális.';
+    if(f < 0.72)
+      return '🌖 <b>Fogyó domború:</b> Hajnali aktivitási csúcs — legjobb a virradati les.';
+    if(f < 0.78)
+      return '🌗 <b>Utolsó negyed:</b> Vegyes, de a reggeli órák adnak több esélyt.';
+    return '🌘 <b>Fogyó sarló:</b> Sötétedő éjszakák — az állatok újra nappalra tolják aktivitásukat. Ígéretes napközben.';
+  }
+
+  const DOW = ['H','K','Sze','Cs','P','Szo','V'];
+  const MONTHS = ['Január','Február','Március','Április','Május','Június','Július','Augusztus','Szeptember','Október','November','December'];
+
+  let viewYear, viewMonth;
+  const bp = nowBP();
+  viewYear = bp.year; viewMonth = bp.month - 1; // 0-based
+
+  function render(){
+    const grid = document.getElementById('moon-grid');
+    const tip = document.getElementById('moon-hunt-tip');
+    const curIcon = document.getElementById('moon-cur-icon');
+    const curName = document.getElementById('moon-cur-name');
+    const curSub = document.getElementById('moon-cur-sub');
+    if(!grid) return;
+
+    // Current moon
+    const now = new Date();
+    const cf = moonPhase(now);
+    curIcon.textContent = phaseIcon(cf);
+    curName.textContent = phaseName(cf) + ' — ' + illumination(cf) + '% megvilágítás';
+    curSub.textContent = MONTHS[viewMonth] + ' ' + viewYear + ' holdnaptár';
+    tip.innerHTML = '🏹 Vadászati tanács: ' + huntTip(cf);
+
+    // Day of week headers
+    grid.innerHTML = '';
+    DOW.forEach(d => {
+      const el = document.createElement('div');
+      el.className = 'moon-dow'; el.textContent = d;
+      grid.appendChild(el);
+    });
+
+    // First day offset (Mon=0)
+    const first = new Date(viewYear, viewMonth, 1);
+    let startDow = first.getDay(); // 0=Sun
+    startDow = (startDow + 6) % 7; // convert to Mon=0
+    const daysInMonth = new Date(viewYear, viewMonth+1, 0).getDate();
+    const todayBP = nowBP();
+
+    for(let i = 0; i < startDow; i++){
+      const el = document.createElement('div');
+      el.className = 'moon-day moon-empty';
+      grid.appendChild(el);
+    }
+
+    for(let d = 1; d <= daysInMonth; d++){
+      const date = new Date(Date.UTC(viewYear, viewMonth, d, 12, 0, 0));
+      const f = moonPhase(date);
+      const icon = phaseIcon(f);
+      const pct = illumination(f);
+      const isToday = (d === todayBP.day && viewMonth === todayBP.month-1 && viewYear === todayBP.year);
+      const isFullNew = (f < 0.05 || f > 0.95 || (f > 0.47 && f < 0.53));
+
+      const el = document.createElement('div');
+      el.className = 'moon-day' + (isToday?' moon-today':'') + (isFullNew?' moon-fullnew':'');
+      el.title = d + '. — ' + phaseName(f) + ' (' + pct + '%)';
+      el.innerHTML = '<span class="moon-dicon">' + icon + '</span>'
+        + '<div class="moon-dnum">' + d + '</div>'
+        + '<div class="moon-dpct">' + pct + '%</div>';
+      grid.appendChild(el);
+    }
+  }
+
+  document.getElementById('moon-prev').addEventListener('click', ()=>{
+    viewMonth--; if(viewMonth<0){viewMonth=11;viewYear--;} render();
+  });
+  document.getElementById('moon-next').addEventListener('click', ()=>{
+    viewMonth++; if(viewMonth>11){viewMonth=0;viewYear++;} render();
+  });
+
+  render();
+})();
 </script>
 </body>
 </html>
