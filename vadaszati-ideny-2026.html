@@ -252,7 +252,7 @@
     /* MONTH HEADER */
     .month-header{
       display:flex;
-      position:sticky;top:62px;z-index:20;
+      position:sticky;top:52px;z-index:20;
       background:rgb(10,10,10);
       border-bottom:1px solid rgba(255,255,255,.1);
       box-shadow:0 2px 12px rgba(0,0,0,.7);
@@ -368,20 +368,18 @@
     /* ── TOPBAR 2026 ── */
     .topbar{
       position:fixed;top:0;left:0;right:0;z-index:200;
-      height:62px;
+      height:52px;
       background:linear-gradient(90deg,rgb(6,6,6) 0%,rgb(10,2,2) 100%);
       border-bottom:2px solid #ff0000;
       box-shadow:0 0 28px rgba(255,0,0,.35),0 4px 40px rgba(0,0,0,.9);
       display:flex;align-items:center;
-      padding:0 28px;
+      padding:0 20px;
       gap:0;
-      font-size:1rem;
-      overflow:hidden;
+      font-size:.88rem;
     }
-    /* scanning red line bottom */
-    .topbar::after{
-      content:'';
-      position:absolute;bottom:-2px;left:-100%;
+    /* scanning red line – külön elem, nem ::after, hogy ne vágja le az overflow */
+    .topbar-scan{
+      position:absolute;bottom:0;left:-60%;z-index:1;
       width:60%;height:2px;
       background:linear-gradient(90deg,transparent,#ff0000,#ff6600,transparent);
       animation:tbScan 3.5s ease-in-out infinite;
@@ -396,12 +394,12 @@
 
     /* brand */
     .topbar-brand{
-      color:#fff;font-weight:900;letter-spacing:.18em;text-transform:uppercase;
-      font-size:1.15rem;
+      color:#fff;font-weight:900;letter-spacing:.14em;text-transform:uppercase;
+      font-size:1rem;
       flex-shrink:0;
       position:relative;
-      padding-left:18px;
-      margin-right:0;
+      padding-left:14px;
+      white-space:nowrap;
     }
     .topbar-brand::before{
       content:'';
@@ -418,25 +416,25 @@
 
     /* divider */
     .topbar-sep{
-      width:1px;height:28px;
+      width:1px;height:22px;
       background:linear-gradient(to bottom,transparent,rgba(255,0,0,.5),transparent);
-      margin:0 20px;flex-shrink:0;
+      margin:0 14px;flex-shrink:0;
     }
 
     /* clock */
     .topbar-clock{
       color:#fff;
-      font-size:1rem;font-weight:400;letter-spacing:.06em;
+      font-size:.88rem;font-weight:400;letter-spacing:.04em;
       font-variant-numeric:tabular-nums;
       flex-shrink:0;white-space:nowrap;
     }
     .topbar-clock .date-part{
-      color:rgba(255,255,255,.55);font-weight:300;margin-right:14px;
+      color:rgba(255,255,255,.55);font-weight:300;margin-right:10px;
     }
     #clk-time{
-      font-weight:700;font-size:1.1rem;
+      font-weight:700;font-size:.95rem;
       color:#ff4444;
-      text-shadow:0 0 12px rgba(255,60,60,.6);
+      text-shadow:0 0 10px rgba(255,60,60,.6);
     }
 
     /* spacer */
@@ -448,22 +446,23 @@
     }
     .topbar-links a{
       color:rgba(255,255,255,.75);
-      font-size:.82rem;font-weight:600;
-      text-decoration:none;letter-spacing:.07em;text-transform:uppercase;
-      padding:0 14px;height:62px;
+      font-size:.72rem;font-weight:600;
+      text-decoration:none;letter-spacing:.04em;text-transform:uppercase;
+      padding:0 10px;height:52px;
       display:flex;align-items:center;
+      white-space:nowrap;
       border-left:1px solid rgba(255,255,255,.07);
-      transition:all .2s;
+      transition:all .18s;
       position:relative;
     }
     .topbar-links a::after{
       content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
       background:#ff0000;transform:scaleX(0);
-      transition:transform .2s;
+      transition:transform .18s;
     }
     .topbar-links a:hover{color:#fff;background:rgba(255,0,0,.08);}
     .topbar-links a:hover::after{transform:scaleX(1);}
-    .topbar-links a:first-child{color:#ff4444;font-weight:700;}
+    .topbar-links a:first-child{color:#ff5555;font-weight:700;}
     .topbar-links a:first-child:hover{color:#ff0000;}
 
     /* hamburger */
@@ -471,33 +470,33 @@
       display:none;
       background:none;border:1px solid rgba(255,0,0,.4);
       color:#fff;border-radius:4px;
-      font-size:1.3rem;cursor:pointer;padding:4px 8px;
+      font-size:1.2rem;cursor:pointer;padding:3px 7px;
       line-height:1;transition:border-color .2s,background .2s;
-      margin-left:auto;
+      margin-left:auto;flex-shrink:0;
     }
     .topbar-ham:hover{border-color:#ff0000;background:rgba(255,0,0,.12);}
 
-    /* mobile dropdown */
+    /* mobile dropdown – desktop-on flex */
     .topbar-menu{ display:flex;gap:0; }
 
-    body{padding-top:62px}
+    body{padding-top:52px}
 
     @media(max-width:700px){
-      body{padding-top:62px;padding-left:10px;padding-right:10px;}
+      body{padding-top:52px;padding-left:10px;padding-right:10px;}
       h1{font-size:1.3rem;}
       .subtitle{font-size:.72rem;}
-      .topbar{padding:0 14px;}
-      .topbar-brand{font-size:.95rem;letter-spacing:.12em;}
+      .topbar{padding:0 12px;}
+      .topbar-brand{font-size:.85rem;letter-spacing:.1em;}
       .topbar-sep{display:none;}
-      .topbar-clock{font-size:.82rem;}
+      .topbar-clock{font-size:.8rem;}
       .topbar-clock .date-part{display:none;}
-      #clk-time{font-size:.9rem;}
+      #clk-time{font-size:.85rem;}
       .topbar-ham{display:flex;align-items:center;}
       .topbar-links{display:none;}
       .topbar-spacer{display:none;}
       .topbar-menu{
         display:none;flex-direction:column;
-        position:fixed;top:62px;left:0;right:0;
+        position:fixed;top:52px;left:0;right:0;
         background:rgb(6,6,6);
         background-image:radial-gradient(circle,rgba(255,255,255,.07) 1px,transparent 1px);
         background-size:24px 24px;
@@ -835,6 +834,7 @@
 
 <!-- TOPBAR -->
 <div class="topbar">
+  <div class="topbar-scan"></div>
   <div class="topbar-brand">VADKÁR VADÁSZ</div>
   <div class="topbar-sep"></div>
   <div class="topbar-clock">
